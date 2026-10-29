@@ -1,0 +1,19 @@
+{
+  "name": "@chub/cli",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:assets": "bun scripts/build-assets.ts",
+    "build:binary": "pnpm --filter @chub/web build && bun run build:assets && bun build --compile src/index.ts --outfile dist/chub",
+    "test:smoke": "bun run build:binary && bun test",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.45.4"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.3.14",
+    "@types/node": "^22.13.10",
+    "typescript": "^5.8.2"
+  }
+}

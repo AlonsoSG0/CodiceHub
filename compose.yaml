@@ -1,0 +1,13 @@
+services:
+  chub:
+    build: .
+    image: chub:local
+    restart: unless-stopped
+    ports:
+      - "${PORT:-3000}:${PORT:-3000}"
+    environment:
+      PORT: ${PORT:-3000}
+      CHUB_DB_PATH: ${CHUB_DB_PATH:-data/chub.db}
+      CHUB_WEB_DIR: ${CHUB_WEB_DIR:-web/dist}
+    volumes:
+      - ./data:/app/data

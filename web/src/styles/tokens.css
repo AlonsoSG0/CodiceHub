@@ -1,0 +1,265 @@
+/* Chub Theme ("atripp"): design/codicehub-theme/ and its CodiceHub banner are the palette sources.
+ * Not carried over: the .ch-* layer, type and radius scale.
+ * `:root` and `.dark` keep the app's original light/dark values; atripp is a third, explicit theme. */
+:root {
+  color-scheme: light;
+  --light-canvas: #ffffff;
+  --light-sidebar: #f7f7f5;
+  --light-border: #e9e9e7;
+  --light-foreground: #37352f;
+  --light-muted-foreground: #787774;
+  --light-hover: #f0f0ee;
+  --light-active: #eaeae8;
+  --light-ring: #65645f;
+  --light-code-block-surface: #f7f7f5;
+  --light-code-block-comment: #686761;
+  --light-code-block-blue: #356b8c;
+  --light-code-block-orange: #8a5424;
+  --light-code-block-green: #466b48;
+  --light-code-block-yellow: #7a641f;
+  --light-code-block-purple: #76528a;
+  --light-code-block-pink: #a43d52;
+  --light-code-block-teal: #2d6f68;
+  --light-code-block-operator: #65645f;
+
+  /* The vendored MDXCN graph components paint their intensity scale with these three values. */
+  --light-graph-accent: #111110;
+  --light-success: #466b48;
+
+  --dark-canvas: #191919;
+  --dark-sidebar: #202020;
+  --dark-border: #2f2f2f;
+  --dark-foreground: #d4d4d4;
+  --dark-muted-foreground: #9b9b9b;
+  --dark-hover: #292929;
+  --dark-active: #303030;
+  --dark-ring: #9b9b9b;
+  --dark-code-block-surface: #202020;
+  --dark-code-block-comment: #6c7086;
+  --dark-code-block-blue: #89b4fa;
+  --dark-code-block-orange: #fab387;
+  --dark-code-block-green: #a6e3a1;
+  --dark-code-block-yellow: #f9e2af;
+  --dark-code-block-purple: #cba6f7;
+  --dark-code-block-pink: #f38ba8;
+  --dark-code-block-teal: #94e2d5;
+  --dark-code-block-operator: #9399b2;
+  --dark-graph-accent: #ffffff;
+  --dark-success: #a6e3a1;
+
+  --background: var(--light-canvas);
+  --foreground: var(--light-foreground);
+  --card: var(--light-canvas);
+  --card-foreground: var(--light-foreground);
+  --popover: var(--light-canvas);
+  --popover-foreground: var(--light-foreground);
+  --primary: var(--light-foreground);
+  --primary-foreground: #ffffff;
+  --secondary: #f1f1ef;
+  --secondary-foreground: var(--light-foreground);
+  --muted: #f1f1ef;
+  --muted-foreground: var(--light-muted-foreground);
+  --accent: var(--light-hover);
+  --accent-foreground: var(--light-foreground);
+  --destructive: #b42318;
+  --border: var(--light-border);
+  --input: var(--light-border);
+  --ring: var(--light-ring);
+  --sidebar: var(--light-sidebar);
+  --sidebar-foreground: var(--light-foreground);
+  --sidebar-primary: var(--light-foreground);
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: var(--light-hover);
+  --sidebar-accent-foreground: var(--light-foreground);
+  --sidebar-border: var(--light-border);
+  --sidebar-ring: var(--light-ring);
+  --chart-1: #787774;
+  --chart-2: #9b9b98;
+  --chart-3: #b8b8b4;
+  --chart-4: #d0d0cc;
+  --chart-5: #e5e5e2;
+  --code-block-surface: var(--light-code-block-surface);
+  --code-block-foreground: var(--light-foreground);
+  --code-block-comment: var(--light-code-block-comment);
+  --code-block-blue: var(--light-code-block-blue);
+  --code-block-orange: var(--light-code-block-orange);
+  --code-block-green: var(--light-code-block-green);
+  --code-block-yellow: var(--light-code-block-yellow);
+  --code-block-purple: var(--light-code-block-purple);
+  --code-block-pink: var(--light-code-block-pink);
+  --code-block-teal: var(--light-code-block-teal);
+  --code-block-operator: var(--light-code-block-operator);
+
+  /* One monochrome ramp for every chart-like surface: `--graph-frame` is an empty cell, `--graph-muted` the middle
+     levels and `--graph-accent` a full one, so a higher level always means more contrast in either theme. */
+  --graph-frame: var(--border);
+  --graph-muted: var(--muted-foreground);
+  --graph-accent: var(--light-graph-accent);
+  --success: var(--light-success);
+  --radius: 5px;
+  --font-family-sans: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+  /*
+   * Room a surface keeps below its own content so the floating dock never covers the last line. The dock measures
+   * itself and overwrites this value on the document element; this declaration is the fallback for the first paint
+   * and for a runtime without a layout engine such as jsdom.
+   */
+  --dock-clearance: 102px;
+}
+
+.dark {
+  color-scheme: dark;
+  --background: var(--dark-canvas);
+  --foreground: var(--dark-foreground);
+  --card: var(--dark-canvas);
+  --card-foreground: var(--dark-foreground);
+  --popover: var(--dark-canvas);
+  --popover-foreground: var(--dark-foreground);
+  --primary: var(--dark-foreground);
+  --primary-foreground: #191919;
+  --secondary: #292929;
+  --secondary-foreground: var(--dark-foreground);
+  --muted: #292929;
+  --muted-foreground: var(--dark-muted-foreground);
+  --accent: var(--dark-hover);
+  --accent-foreground: var(--dark-foreground);
+  --destructive: #f87171;
+  --border: var(--dark-border);
+  --input: var(--dark-border);
+  --ring: var(--dark-ring);
+  --sidebar: var(--dark-sidebar);
+  --sidebar-foreground: var(--dark-foreground);
+  --sidebar-primary: var(--dark-foreground);
+  --sidebar-primary-foreground: #191919;
+  --sidebar-accent: var(--dark-hover);
+  --sidebar-accent-foreground: var(--dark-foreground);
+  --sidebar-border: var(--dark-border);
+  --sidebar-ring: var(--dark-ring);
+  --chart-1: #d4d4d4;
+  --chart-2: #b3b3b3;
+  --chart-3: #9b9b9b;
+  --chart-4: #747474;
+  --chart-5: #5a5a5a;
+  --code-block-surface: var(--dark-code-block-surface);
+  --code-block-foreground: var(--dark-foreground);
+  --code-block-comment: var(--dark-code-block-comment);
+  --code-block-blue: var(--dark-code-block-blue);
+  --code-block-orange: var(--dark-code-block-orange);
+  --code-block-green: var(--dark-code-block-green);
+  --code-block-yellow: var(--dark-code-block-yellow);
+  --code-block-purple: var(--dark-code-block-purple);
+  --code-block-pink: var(--dark-code-block-pink);
+  --code-block-teal: var(--dark-code-block-teal);
+  --code-block-operator: var(--dark-code-block-operator);
+  --graph-frame: var(--border);
+  --graph-muted: var(--muted-foreground);
+  --graph-accent: var(--dark-graph-accent);
+  --success: var(--dark-success);
+}
+
+/*
+ * The third theme, atripp: the CodiceHub Midnight Orchid canvas the user chose, with the brand hues pushed
+ * where the user asked to see them — violet borders and hover surfaces, a violet primary, lilac focus, the
+ * five-hue chart ramp and a magenta full-cell heatmap accent. It is dark-family, so `color-scheme: dark`.
+ */
+.atripp {
+  color-scheme: dark;
+  --gradient-brand: linear-gradient(110deg, #B56AF8 0%, #DB7AFC 26%, #FB42DB 61%, #FC4A5D 100%);
+  --background: #0b0e17;
+  --foreground: #f8f7fc;
+  --card: #151222;
+  --card-foreground: #f8f7fc;
+  --popover: #191327;
+  --popover-foreground: #f8f7fc;
+  --primary: #b56af8;
+  --primary-foreground: #160c1c;
+  --secondary: #241a35;
+  --secondary-foreground: #f8f7fc;
+  --muted: #241a35;
+  --muted-foreground: #b6b0c4;
+  --accent: #2a1b3d;
+  --accent-foreground: #f8f7fc;
+  --destructive: #ff6d7e;
+  --border: #5b4a77;
+  --input: #5b4a77;
+  --ring: #db7afc;
+  --sidebar: #080911;
+  --sidebar-foreground: #f8f7fc;
+  --sidebar-primary: #db7afc;
+  --sidebar-primary-foreground: #160c1c;
+  --sidebar-accent: #2a1b3d;
+  --sidebar-accent-foreground: #f8f7fc;
+  --sidebar-border: rgba(219, 122, 252, 0.22);
+  --sidebar-ring: #db7afc;
+  --chart-1: #b56af8;
+  --chart-2: #db7afc;
+  --chart-3: #fb42db;
+  --chart-4: #fc5aa2;
+  --chart-5: #fc4a5d;
+  --code-block-surface: #151222;
+  --code-block-foreground: #f8f7fc;
+  --code-block-comment: #aaa0b7;
+  --code-block-blue: #89b4fa;
+  --code-block-orange: #fab387;
+  --code-block-green: #a6e3a1;
+  --code-block-yellow: #f9e2af;
+  --code-block-purple: #cba6f7;
+  --code-block-pink: #f38ba8;
+  --code-block-teal: #94e2d5;
+  --code-block-operator: #b6b0c4;
+  --graph-frame: var(--border);
+  --graph-muted: #8f889e;
+  --graph-accent: #fb42db;
+  --success: #68d5ad;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not(.light):not(.atripp) {
+    --background: var(--dark-canvas);
+    --foreground: var(--dark-foreground);
+    --card: var(--dark-canvas);
+    --card-foreground: var(--dark-foreground);
+    --popover: var(--dark-canvas);
+    --popover-foreground: var(--dark-foreground);
+    --primary: var(--dark-foreground);
+    --primary-foreground: #191919;
+    --secondary: #292929;
+    --secondary-foreground: var(--dark-foreground);
+    --muted: #292929;
+    --muted-foreground: var(--dark-muted-foreground);
+    --accent: var(--dark-hover);
+    --accent-foreground: var(--dark-foreground);
+    --destructive: #f87171;
+    --border: var(--dark-border);
+    --input: var(--dark-border);
+    --ring: var(--dark-ring);
+    --sidebar: var(--dark-sidebar);
+    --sidebar-foreground: var(--dark-foreground);
+    --sidebar-primary: var(--dark-foreground);
+    --sidebar-primary-foreground: #191919;
+    --sidebar-accent: var(--dark-hover);
+    --sidebar-accent-foreground: var(--dark-foreground);
+    --sidebar-border: var(--dark-border);
+    --sidebar-ring: var(--dark-ring);
+    --chart-1: #d4d4d4;
+    --chart-2: #b3b3b3;
+    --chart-3: #9b9b9b;
+    --chart-4: #747474;
+    --chart-5: #5a5a5a;
+    --code-block-surface: var(--dark-code-block-surface);
+    --code-block-foreground: var(--dark-foreground);
+    --code-block-comment: var(--dark-code-block-comment);
+    --code-block-blue: var(--dark-code-block-blue);
+    --code-block-orange: var(--dark-code-block-orange);
+    --code-block-green: var(--dark-code-block-green);
+    --code-block-yellow: var(--dark-code-block-yellow);
+    --code-block-purple: var(--dark-code-block-purple);
+    --code-block-pink: var(--dark-code-block-pink);
+    --code-block-teal: var(--dark-code-block-teal);
+    --code-block-operator: var(--dark-code-block-operator);
+    --graph-frame: var(--border);
+    --graph-muted: var(--muted-foreground);
+    --graph-accent: var(--dark-graph-accent);
+    --success: var(--dark-success);
+  }
+}

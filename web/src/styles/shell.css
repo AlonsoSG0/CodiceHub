@@ -1,0 +1,565 @@
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+  min-height: 100%;
+  font-family: var(--font-family-sans);
+  font-size: 14px;
+  background: var(--background);
+}
+
+body {
+  min-width: 320px;
+  min-height: 100dvh;
+  margin: 0;
+  background: var(--background);
+  color: var(--foreground);
+  line-height: 1.6;
+}
+
+button,
+a {
+  font: inherit;
+  touch-action: manipulation;
+}
+
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+.atripp [data-slot="button"][data-variant="default"] {
+  background-image: var(--gradient-brand);
+  color: #160c1c;
+  border: 1px solid rgba(255, 255, 255, .12);
+  box-shadow: 0 3px 15px rgba(251, 66, 219, .10);
+}
+
+.atripp [data-slot="button"][data-variant="default"]:hover:not(:disabled) {
+  box-shadow: 0 3px 15px rgba(251, 66, 219, .25);
+}
+
+.atripp :is(a, button, input, textarea, select, [tabindex]):focus-visible,
+.atripp [data-slot="button"][data-variant="default"]:focus-visible,
+.atripp [data-slot="button"][data-variant="default"]:hover:not(:disabled):focus-visible {
+  box-shadow: 0 0 0 1px rgba(219, 122, 252, .45), 0 0 16px rgba(181, 106, 248, .30);
+}
+
+.atripp ::selection {
+  background: rgba(181, 106, 248, .35);
+}
+
+.workspace-shell {
+  min-height: 100dvh;
+}
+
+.workspace-sidebar {
+  position: fixed;
+  z-index: 30;
+  inset: 0 auto 0 0;
+  display: flex;
+  width: 240px;
+  flex-direction: column;
+  overflow: hidden;
+  border-right: 1px solid var(--sidebar-border);
+  background: var(--sidebar);
+  color: var(--sidebar-foreground);
+}
+
+.sidebar-header {
+  padding: 12px;
+  border-bottom: 1px solid var(--sidebar-border);
+}
+
+.sidebar-heading-row {
+  display: flex;
+  min-height: 32px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.workspace-title {
+  overflow: hidden;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sidebar-close {
+  display: none;
+}
+
+/* Search and new page share one row: the sidebar is a list of pages, not a stack of buttons. */
+.sidebar-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.sidebar-search {
+  min-width: 0;
+  flex: 1;
+  justify-content: flex-start;
+  padding-inline: 8px;
+}
+
+.sidebar-new-page {
+  flex: none;
+}
+
+.sidebar-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+/* One quiet label per shelf, 11px and normal case: the tree does the talking. */
+.sidebar-group {
+  display: grid;
+  gap: 2px;
+}
+
+.sidebar-shelf {
+  display: grid;
+  gap: 2px;
+}
+
+.sidebar-group + .sidebar-shelf,
+.sidebar-shelf + .sidebar-shelf {
+  margin-top: 12px;
+}
+
+.sidebar-group-heading {
+  display: flex;
+  min-height: 22px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding-inline: 8px;
+  color: var(--muted-foreground);
+  font-size: 11px;
+}
+
+.sidebar-shelf-heading {
+  gap: 2px;
+  padding-inline: 2px;
+  border-radius: 6px;
+  transition: background 150ms ease-out, color 150ms ease-out;
+}
+
+.sidebar-shelf-heading[data-drop="true"] {
+  background: var(--sidebar-accent);
+  color: var(--sidebar-foreground);
+}
+
+.sidebar-shelf-toggle {
+  display: inline-flex;
+  width: 18px;
+  height: 18px;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.sidebar-shelf-toggle:hover {
+  background: var(--sidebar-accent);
+  color: var(--sidebar-foreground);
+}
+
+.sidebar-shelf-label {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sidebar-shelf-actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity 150ms ease-out;
+}
+
+.sidebar-shelf-heading:hover .sidebar-shelf-actions,
+.sidebar-shelf-heading:focus-within .sidebar-shelf-actions {
+  opacity: 1;
+}
+
+.sidebar-shelf-input {
+  min-width: 0;
+  height: 20px;
+  flex: 1;
+  border: 1px solid var(--ring);
+  border-radius: 4px;
+  background: var(--background);
+  padding: 0 4px;
+  color: var(--foreground);
+  font: inherit;
+  outline: none;
+}
+
+.sidebar-new-section {
+  display: flex;
+  width: 100%;
+  min-height: 26px;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  padding-inline: 4px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--muted-foreground);
+  font-size: 11px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.sidebar-new-section:hover {
+  background: var(--sidebar-accent);
+  color: var(--sidebar-foreground);
+}
+
+.sidebar-group-action {
+  display: inline-flex;
+  width: 20px;
+  height: 20px;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--muted-foreground);
+  cursor: pointer;
+}
+
+.sidebar-group-action:hover {
+  background: var(--sidebar-accent);
+  color: var(--sidebar-foreground);
+}
+
+.page-row {
+  min-height: 28px;
+}
+
+html[data-density="comfortable"] .page-row {
+  min-height: 34px;
+}
+
+/* The slot never collapses, so icons line up; the chevron itself only appears when it can be used. */
+.page-row-chevron-slot {
+  display: inline-flex;
+  width: 18px;
+  height: 18px;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.page-row-chevron {
+  display: inline-flex;
+  width: 18px;
+  height: 18px;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 120ms ease-out, background 120ms ease-out;
+}
+
+.page-row:hover .page-row-chevron,
+.page-row:focus-within .page-row-chevron,
+.page-row[data-expanded="true"] .page-row-chevron {
+  opacity: 1;
+}
+
+.page-row-chevron:hover {
+  background: color-mix(in srgb, var(--sidebar-foreground) 8%, transparent);
+  color: var(--sidebar-foreground);
+}
+
+/* Touch gets a 40px row and 32px targets; a 28px row with three controls inside mis-taps. */
+@media (pointer: coarse) {
+  .page-row,
+  html[data-density="comfortable"] .page-row {
+    min-height: 40px;
+  }
+
+  .page-row-action {
+    width: 32px;
+    height: 32px;
+  }
+
+  .sidebar-shelf-actions {
+    opacity: 1;
+  }
+
+  .page-row-chevron {
+    opacity: 1;
+  }
+}
+
+.placeholder-label {
+  margin: 0 0 12px;
+  color: var(--muted-foreground);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.sidebar-skeleton {
+  display: grid;
+  gap: 8px;
+  padding: 0 4px;
+}
+
+.skeleton-line {
+  display: block;
+  height: 8px;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--foreground) 9%, transparent);
+}
+
+.skeleton-line:nth-child(1) {
+  width: 82%;
+}
+
+.skeleton-line:nth-child(2) {
+  width: 64%;
+}
+
+.skeleton-line:nth-child(3) {
+  width: 74%;
+}
+
+.canvas-main {
+  display: flex;
+  min-width: 0;
+  min-height: 100dvh;
+  flex-direction: column;
+  margin-left: 240px;
+  background: var(--background);
+}
+
+.canvas-toolbar {
+  position: sticky;
+  z-index: 10;
+  top: 0;
+  display: flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--background);
+}
+
+.canvas-toolbar-start,
+.canvas-toolbar-end {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+}
+
+.canvas-toolbar-start > nav {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.mobile-menu-toggle {
+  display: none;
+}
+
+.breadcrumb {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  color: var(--muted-foreground);
+  font-size: 13px;
+  list-style: none;
+  white-space: nowrap;
+}
+
+.breadcrumb > li {
+  min-width: 0;
+  flex: 0 1 auto;
+}
+
+.breadcrumb-current {
+  overflow: hidden;
+  color: var(--foreground);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.canvas-content {
+  width: 100%;
+  flex: 1;
+}
+
+.page-column {
+  width: min(100%, 708px);
+  margin-inline: auto;
+  padding: 48px 28px;
+}
+
+/*
+ * The dock floats over the page and measures itself into `--dock-clearance`. Every surface that ends at the window
+ * edge reserves that height plus one gap below its own content, so writing to the last line never leaves the caret
+ * under the dock. The dock's measured block already carries its own margins and bottom padding.
+ */
+.page-column,
+.dock-safe-bottom {
+  padding-bottom: calc(16px + var(--dock-clearance));
+}
+
+.page-title {
+  margin: 0 0 12px;
+  color: var(--foreground);
+  font-size: 40px;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.empty-state-copy,
+.page-placeholder-copy {
+  max-width: 60ch;
+  margin: 0;
+  color: var(--muted-foreground);
+  line-height: 1.6;
+}
+
+.page-placeholder-copy + .loading-skeleton {
+  margin-top: 40px;
+}
+
+.loading-skeleton {
+  display: grid;
+  width: 100%;
+  max-width: 460px;
+  gap: 12px;
+}
+
+.loading-skeleton .skeleton-line {
+  height: 10px;
+}
+
+.loading-skeleton .skeleton-line:last-child {
+  width: 52%;
+}
+
+.sidebar-scrim {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .workspace-sidebar {
+    width: min(280px, calc(100vw - 40px));
+    transform: translateX(-100%);
+    transition: transform 180ms ease-out, visibility 180ms ease-out;
+    visibility: hidden;
+  }
+
+  .workspace-shell[data-mobile-open="true"] .workspace-sidebar {
+    transform: translateX(0);
+    visibility: visible;
+  }
+
+  .workspace-shell[data-mobile-open="true"] .sidebar-scrim {
+    position: fixed;
+    z-index: 20;
+    inset: 0;
+    display: block;
+    border: 0;
+    background: rgb(0 0 0 / 40%);
+  }
+
+  .sidebar-close {
+    display: inline-flex;
+  }
+
+  .canvas-main {
+    margin-left: 0;
+  }
+
+  .canvas-toolbar {
+    min-height: 52px;
+    padding-inline: 12px;
+  }
+
+  .mobile-menu-toggle {
+    display: inline-flex;
+  }
+
+  /* A phone toolbar only has room for the name of where you are; the sidebar carries the ancestors. */
+  .breadcrumb > li:not(.breadcrumb-current) {
+    display: none;
+  }
+
+  .breadcrumb-current > span[aria-hidden="true"] {
+    display: none;
+  }
+
+  .mobile-menu-toggle,
+  .sidebar-close,
+  .canvas-toolbar-end > button {
+    min-height: 44px;
+  }
+
+  .sidebar-new-page {
+    width: 44px;
+  }
+
+  .page-row {
+    min-height: 40px;
+  }
+
+  .page-row-action {
+    width: 32px;
+    height: 32px;
+  }
+
+  .page-column {
+    padding: 40px 20px calc(16px + var(--dock-clearance));
+  }
+
+  .page-title {
+    font-size: clamp(32px, 8vw, 40px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

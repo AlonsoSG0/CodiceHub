@@ -1,0 +1,194 @@
+/*
+ * CodiceHub / Midnight Orchid
+ * Brand reference: CodiceHub_Banner_Oscuro_Iconos.png
+ * Theme tokens are representative colors sampled/curated from a rendered image.
+ * Theme implementation: dark-first, calm surfaces, selective neon glow.
+ */
+
+:root,
+[data-theme="codicehub"] {
+  color-scheme: dark;
+
+  /* Brand */
+  --ch-violet: #B56AF8;
+  --ch-lilac: #DB7AFC;
+  --ch-magenta: #FB42DB;
+  --ch-pink: #FC5AA2;
+  --ch-coral: #FC4A5D;
+
+  /* Dark UI */
+  --ch-bg-deep: #05080D;
+  --ch-bg: #0B0E17;
+  --ch-bg-raised: #10111D;
+  --ch-surface: #151222;
+  --ch-surface-hover: #21172F;
+  --ch-surface-active: #281633;
+  --ch-text: #F8F7FC;
+  --ch-text-muted: #B6B0C4;
+  --ch-text-faint: #8F889E;
+  --ch-border: rgba(219, 122, 252, .17);
+  --ch-border-strong: rgba(219, 122, 252, .38);
+
+  /* Functional colors: use semantic labels/icons, not color alone */
+  --ch-success: #68D5AD;
+  --ch-warning: #F6C775;
+  --ch-danger: #FF6D7E;
+
+  /* Signature gradients */
+  --ch-gradient-brand: linear-gradient(110deg, #B56AF8 0%, #DB7AFC 26%, #FB42DB 61%, #FC4A5D 100%);
+  --ch-gradient-highlight: linear-gradient(105deg, #DB7AFC 0%, #FB42DB 52%, #FC4A5D 100%);
+  --ch-gradient-icon: linear-gradient(145deg, #DB7AFC 0%, #E146EC 48%, #FB42DB 76%, #FC4A5D 100%);
+  --ch-gradient-ambient:
+    radial-gradient(ellipse at 15% 0%, rgba(181, 106, 248, .12) 0%, transparent 45%),
+    radial-gradient(ellipse at 95% 35%, rgba(251, 66, 219, .065) 0%, transparent 40%),
+    linear-gradient(180deg, #0B0E17 0%, #05080D 100%);
+
+  /* Soft neon: accent interactions; never behind long-form content */
+  --ch-shadow-card: 0 8px 30px rgba(0, 0, 0, .20);
+  --ch-glow-violet: 0 0 0 1px rgba(219, 122, 252, .24), 0 0 22px rgba(181, 106, 248, .15);
+  --ch-glow-magenta: 0 0 0 1px rgba(251, 66, 219, .25), 0 0 26px rgba(251, 66, 219, .18);
+  --ch-glow-coral: 0 0 0 1px rgba(252, 74, 93, .22), 0 0 24px rgba(252, 74, 93, .15);
+
+  /* Geometry and motion */
+  --ch-radius-xs: 8px;
+  --ch-radius-sm: 12px;
+  --ch-radius-md: 16px;
+  --ch-radius-lg: 20px;
+  --ch-duration-fast: 160ms;
+  --ch-duration-normal: 220ms;
+  --ch-ease: cubic-bezier(.2, .8, .2, 1);
+  --ch-font: Inter, Manrope, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+/* Mount on the application root element, for example: <div data-theme="codicehub"> */
+[data-theme="codicehub"] {
+  background: var(--ch-gradient-ambient);
+  background-attachment: fixed;
+  color: var(--ch-text);
+  font-family: var(--ch-font);
+  min-height: 100vh;
+}
+
+[data-theme="codicehub"] .ch-sidebar {
+  background: rgba(8, 9, 17, .94);
+  border-right: 1px solid var(--ch-border);
+}
+
+[data-theme="codicehub"] .ch-card {
+  border: 1px solid var(--ch-border);
+  border-radius: var(--ch-radius-md);
+  background: var(--ch-surface);
+  box-shadow: var(--ch-shadow-card);
+  transition: background var(--ch-duration-normal) var(--ch-ease),
+              border-color var(--ch-duration-normal) var(--ch-ease),
+              box-shadow var(--ch-duration-normal) var(--ch-ease);
+}
+[data-theme="codicehub"] .ch-card:hover {
+  background: var(--ch-surface-hover);
+  border-color: var(--ch-border-strong);
+}
+
+[data-theme="codicehub"] .ch-button-primary {
+  border: 1px solid rgba(255, 255, 255, .12);
+  border-radius: var(--ch-radius-sm);
+  color: #160C1C;
+  font-weight: 700;
+  background: var(--ch-gradient-brand);
+  box-shadow: 0 3px 15px rgba(251, 66, 219, .10);
+  transition: box-shadow var(--ch-duration-normal) var(--ch-ease),
+              transform var(--ch-duration-normal) var(--ch-ease);
+}
+[data-theme="codicehub"] .ch-button-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--ch-glow-magenta);
+}
+[data-theme="codicehub"] .ch-button-primary:disabled {
+  opacity: .45;
+  transform: none;
+  box-shadow: none;
+}
+
+[data-theme="codicehub"] .ch-nav-item {
+  color: var(--ch-text-muted);
+  border-radius: var(--ch-radius-sm);
+}
+[data-theme="codicehub"] .ch-nav-item:hover {
+  color: var(--ch-text);
+  background: rgba(219, 122, 252, .08);
+}
+[data-theme="codicehub"] .ch-nav-item[aria-current="page"],
+[data-theme="codicehub"] .ch-nav-item[data-active="true"] {
+  color: var(--ch-text);
+  background: rgba(181, 106, 248, .14);
+  box-shadow: inset 3px 0 0 var(--ch-violet);
+}
+
+[data-theme="codicehub"] .ch-input,
+[data-theme="codicehub"] .ch-editor {
+  background: var(--ch-bg-raised);
+  color: var(--ch-text);
+  border: 1px solid var(--ch-border);
+  border-radius: var(--ch-radius-sm);
+}
+[data-theme="codicehub"] :is(button, input, textarea, select, a):focus-visible {
+  outline: 2px solid var(--ch-lilac);
+  outline-offset: 3px;
+}
+
+/* Use a single bright border/halo for active widgets, not for every card */
+[data-theme="codicehub"] .ch-feature-tile,
+[data-theme="codicehub"] .ch-selected-card {
+  border: 1px solid rgba(219, 122, 252, .40);
+  background: linear-gradient(145deg, rgba(80, 31, 89, .42), rgba(21, 18, 34, .94));
+  box-shadow: var(--ch-glow-violet);
+}
+
+[data-theme="codicehub"] .ch-progress-track {
+  height: 7px;
+  border-radius: 999px;
+  background: rgba(219, 122, 252, .12);
+  overflow: hidden;
+}
+[data-theme="codicehub"] .ch-progress-fill {
+  height: 100%;
+  background: var(--ch-gradient-brand);
+  border-radius: inherit;
+}
+
+[data-theme="codicehub"] .ch-gradient-text {
+  background: var(--ch-gradient-highlight);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Soft connector network: reserved for the dashboard hero/overview */
+[data-theme="codicehub"] .ch-orbit-line {
+  stroke: rgba(219, 122, 252, .24);
+  stroke-width: 1;
+  fill: none;
+}
+[data-theme="codicehub"] .ch-orbit-node {
+  fill: var(--ch-magenta);
+  filter: drop-shadow(0 0 6px rgba(251, 66, 219, .65));
+}
+
+/* Assign modules a consistent accent without recoloring their entire surface */
+[data-theme="codicehub"] .ch-section--notes { --ch-section-accent: var(--ch-lilac); }
+[data-theme="codicehub"] .ch-section--habits { --ch-section-accent: var(--ch-magenta); }
+[data-theme="codicehub"] .ch-section--library { --ch-section-accent: var(--ch-violet); }
+[data-theme="codicehub"] .ch-section--routine { --ch-section-accent: var(--ch-coral); }
+[data-theme="codicehub"] .ch-section--goals { --ch-section-accent: var(--ch-pink); }
+[data-theme="codicehub"] .ch-section--tasks { --ch-section-accent: var(--ch-magenta); }
+[data-theme="codicehub"] .ch-section--projects { --ch-section-accent: var(--ch-violet); }
+[data-theme="codicehub"] .ch-section-accent { color: var(--ch-section-accent, var(--ch-lilac)); }
+
+@media (prefers-reduced-motion: reduce) {
+  [data-theme="codicehub"] *,
+  [data-theme="codicehub"] *::before,
+  [data-theme="codicehub"] *::after {
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "name": "CodiceHub Midnight Orchid",
+  "reference": "CodiceHub_Banner_Oscuro_Iconos.png",
+  "note": "Hex values are representative samples/curation from a rendered image, not official source vectors.",
+  "colors": {
+    "brand": {
+      "violet": "#B56AF8",
+      "lilac": "#DB7AFC",
+      "magenta": "#FB42DB",
+      "pink": "#FC5AA2",
+      "coral": "#FC4A5D"
+    },
+    "background": {
+      "deep": "#05080D",
+      "base": "#0B0E17",
+      "raised": "#10111D"
+    },
+    "surface": {
+      "base": "#151222",
+      "hover": "#21172F",
+      "active": "#281633"
+    },
+    "text": {
+      "base": "#F8F7FC",
+      "muted": "#B6B0C4",
+      "faint": "#8F889E"
+    },
+    "semantic": {
+      "success": "#68D5AD",
+      "warning": "#F6C775",
+      "danger": "#FF6D7E"
+    }
+  },
+  "gradients": {
+    "brand": "linear-gradient(110deg, #B56AF8 0%, #DB7AFC 26%, #FB42DB 61%, #FC4A5D 100%)",
+    "highlight": "linear-gradient(105deg, #DB7AFC 0%, #FB42DB 52%, #FC4A5D 100%)"
+  },
+  "typography": {
+    "ui": "Inter",
+    "headings": "Inter or Manrope",
+    "bodyPx": 16,
+    "weightNormal": 400,
+    "weightMedium": 500,
+    "weightBold": 700
+  },
+  "radiiPx": {
+    "small": 12,
+    "medium": 16,
+    "large": 20
+  },
+  "motionMs": {
+    "fast": 160,
+    "normal": 220
+  },
+  "rules": [
+    "Dark surfaces dominate; use neon sparingly",
+    "Thin curved nodes/lines belong on dashboard or brand areas only",
+    "Keep notes/editor highly readable",
+    "Respect reduced motion and accessibility",
+    "Do not change app business logic"
+  ]
+}

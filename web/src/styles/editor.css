@@ -1,0 +1,147 @@
+/* Keep code blocks aligned with the active light/dark palette. */
+.block-editor-content .ProseMirror pre {
+  background-color: var(--code-block-surface);
+  color: var(--code-block-foreground);
+}
+
+.block-editor-content .ProseMirror pre .hljs-comment,
+.block-editor-content .ProseMirror pre .hljs-quote {
+  color: var(--code-block-comment);
+}
+
+.block-editor-content .ProseMirror pre .hljs-variable,
+.block-editor-content .ProseMirror pre .hljs-template-variable,
+.block-editor-content .ProseMirror pre .hljs-attribute,
+.block-editor-content .ProseMirror pre .hljs-tag,
+.block-editor-content .ProseMirror pre .hljs-regexp,
+.block-editor-content .ProseMirror pre .hljs-link,
+.block-editor-content .ProseMirror pre .hljs-name,
+.block-editor-content .ProseMirror pre .hljs-selector-id,
+.block-editor-content .ProseMirror pre .hljs-selector-class,
+.block-editor-content .ProseMirror pre .hljs-attr {
+  color: var(--code-block-blue);
+}
+
+.block-editor-content .ProseMirror pre .hljs-number,
+.block-editor-content .ProseMirror pre .hljs-meta,
+.block-editor-content .ProseMirror pre .hljs-built_in,
+.block-editor-content .ProseMirror pre .hljs-builtin-name,
+.block-editor-content .ProseMirror pre .hljs-literal,
+.block-editor-content .ProseMirror pre .hljs-type,
+.block-editor-content .ProseMirror pre .hljs-params {
+  color: var(--code-block-orange);
+}
+
+.block-editor-content .ProseMirror pre .hljs-string,
+.block-editor-content .ProseMirror pre .hljs-symbol,
+.block-editor-content .ProseMirror pre .hljs-bullet,
+.block-editor-content .ProseMirror pre .hljs-addition {
+  color: var(--code-block-green);
+}
+
+.block-editor-content .ProseMirror pre .hljs-title,
+.block-editor-content .ProseMirror pre .hljs-section {
+  color: var(--code-block-yellow);
+}
+
+.block-editor-content .ProseMirror pre .hljs-keyword,
+.block-editor-content .ProseMirror pre .hljs-selector-tag,
+.block-editor-content .ProseMirror pre .hljs-variable.language_ {
+  color: var(--code-block-purple);
+}
+
+.block-editor-content .ProseMirror pre .hljs-doctag,
+.block-editor-content .ProseMirror pre .hljs-deletion {
+  color: var(--code-block-pink);
+}
+
+.block-editor-content .ProseMirror pre .hljs-selector-attr,
+.block-editor-content .ProseMirror pre .hljs-selector-pseudo {
+  color: var(--code-block-teal);
+}
+
+.block-editor-content .ProseMirror pre .hljs-operator,
+.block-editor-content .ProseMirror pre .hljs-punctuation {
+  color: var(--code-block-operator);
+}
+
+.block-editor-content .ProseMirror pre .hljs-subst {
+  color: var(--code-block-foreground);
+}
+
+.block-editor-content .ProseMirror pre .hljs-addition {
+  background-color: color-mix(in srgb, var(--code-block-green) 12%, transparent);
+}
+
+.block-editor-content .ProseMirror pre .hljs-deletion {
+  background-color: color-mix(in srgb, var(--code-block-pink) 12%, transparent);
+}
+
+.page-editor-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.page-editor-heading .page-title {
+  min-width: 0;
+  flex: 1;
+  margin: 0;
+}
+
+.page-title-input {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 3px;
+  outline: none;
+  background: transparent;
+  color: var(--foreground);
+  font: inherit;
+  letter-spacing: inherit;
+  line-height: inherit;
+}
+
+.page-title-input::placeholder {
+  color: var(--muted-foreground);
+  opacity: 0.72;
+}
+
+.page-title-input:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 4px;
+}
+
+.page-editor-status {
+  flex: none;
+  padding-top: 16px;
+  color: var(--muted-foreground);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.page-editor .block-editor-content .ProseMirror {
+  min-height: 280px;
+  padding: 8px 0;
+  overflow: visible;
+  line-height: 1.7;
+}
+
+.page-editor .block-editor-content .ProseMirror:focus-visible {
+  outline: none;
+}
+
+@media (max-width: 480px) {
+  .page-editor-heading {
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .page-editor-status {
+    padding-top: 13px;
+  }
+}

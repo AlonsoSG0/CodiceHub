@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" sizes="64x64" href="/brand/CodiceHub_Favicon_64.png" />
+    <title>Chub Notes</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Instrument+Sans:wght@400;500;600&family=Instrument+Serif:wght@400;500&family=Geist:wght@400;500;700&family=Geist+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      try {
+        let settings;
+        try { settings = JSON.parse(localStorage.getItem("chub.settings")); } catch { /* Adopt legacy settings below. */ }
+        const storedTheme = settings && typeof settings === "object" && !Array.isArray(settings)
+          ? settings["appearance.theme"] : localStorage.getItem("chub-theme");
+        const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        const theme = storedTheme === "atripp" ? "atripp" : storedTheme === "dark" || (storedTheme !== "light" && prefersDark) ? "dark" : "light";
+        document.documentElement.classList.add(theme);
+        document.documentElement.style.colorScheme = theme === "light" ? "light" : "dark";
+      } catch {
+        // The CSS media query still supplies the system theme when storage is unavailable.
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
