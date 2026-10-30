@@ -187,3 +187,17 @@ Recovery on the machine, with the user's authorization: `SIGTERM` to 121212 (lef
 `/api/health` both `200`, and the legacy unmarked directory is still there, which is the new rule working. Note what
 this means for versions: the pushed tag `v0.5.0` does **not** contain this fix, the locally installed binary does.
 When that release publishes, cut 0.5.1 with it.
+
+**L13 (release 0.5.1, and the first real `chub update`):** the user cancelled the stuck 0.5.0 run and asked for the fix
+to ship, so 0.5.1 was cut: suite re-run with the new version (`cli` 57 pass, exit 0, binary reporting 0.5.1),
+`chore: release 0.5.1` (`2e3adb9`), lightweight tag `v0.5.1`. The run queued five minutes and finished in two, and the
+release published six assets with `draft=false`. Verified the way a user would, not from the UI: `SHA256SUMS` has five
+lines, `chub-linux-x64.gz` fetched anonymously from `/releases/latest/download/` passes `sha256sum --check`, and the
+published binary reports `0.5.1`.
+
+Then the end-to-end proof this feature never had: `chub update` on the user's machine, against GitHub, replaced
+`~/.local/bin/chub` (`0.5.0` → `0.5.1`), printed "Run chub restart to apply the new version", and `chub restart` brought
+the same port back on pid 278695 reporting `0.5.1`, with `/` and `/api/health` both `200`. The pruning rule proved
+itself live in the same restart: the extraction owned by the dead pid 259309 was removed, the new one recorded
+pid 278695, and the unmarked legacy directory was kept. The abandoned `v0.5.0` tag still points at `cbe3a52` with no
+release behind it; deleting it stays the user's decision.
