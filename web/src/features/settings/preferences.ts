@@ -48,7 +48,7 @@ const defaultModules: ModulePreference = { order: moduleIds, hidden: [] }
 const retentionValues = ["never", "7", "15", "30"] as const
 
 export const preferences: readonly PreferenceEntry<unknown>[] = [
-  { key: "appearance.theme", group: "Appearance", scope: "device", kind: "select", label: "Theme", description: "Choose the color theme.", default: "system", options: ["light", "dark", "atripp", "system"], validate: oneOf("light", "dark", "atripp", "system") },
+  { key: "appearance.theme", group: "Appearance", scope: "device", kind: "select", label: "Theme", description: "Choose the color theme.", default: "atripp", options: ["light", "dark", "atripp", "system"], validate: oneOf("light", "dark", "atripp", "system") },
   { key: "appearance.density", group: "Appearance", scope: "device", kind: "select", label: "Density", description: "Choose the interface density.", default: "compact", options: ["compact", "comfortable"], validate: oneOf("compact", "comfortable") },
   { key: "appearance.motion", group: "Appearance", scope: "device", kind: "select", label: "Motion", description: "Choose the motion preference.", default: "system", options: ["system", "reduced"], validate: oneOf("system", "reduced") },
   { key: "appearance.language", group: "Appearance", scope: "device", kind: "select", label: "Language", description: "Choose the interface language.", default: "en", options: ["en", "es"], validate: oneOf("en", "es") },

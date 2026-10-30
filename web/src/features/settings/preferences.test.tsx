@@ -35,7 +35,7 @@ describe("settings preferences", () => {
     ])
     expect(store.preference("appearance.theme")?.options).toEqual(["light", "dark", "atripp", "system"])
     expect(store.validatePreference("appearance.theme", "atripp")).toBe(true)
-    expect(store.defaultOf("appearance.theme")).toBe("system")
+    expect(store.defaultOf("appearance.theme")).toBe("atripp")
     expect(store.defaultOf("appearance.density")).toBe("compact")
     expect(store.defaultOf("appearance.motion")).toBe("system")
     expect(store.defaultOf("nav.dockPinned")).toBe(false)
@@ -118,7 +118,7 @@ describe("settings preferences", () => {
     window.localStorage.setItem("chub-theme", "ultraviolet")
     window.localStorage.setItem("chub.tasks.retention", JSON.stringify({ days: 3, scope: "all" }))
     const store = await loadStore()
-    expect(renderHook(() => store.usePreference("appearance.theme")).result.current[0]).toBe("system")
+    expect(renderHook(() => store.usePreference("appearance.theme")).result.current[0]).toBe("atripp")
     expect(renderHook(() => store.usePreference("modules.retention")).result.current[0]).toBe("never")
     // A corrupt window must not also lose the wider scope the user picked.
     expect(renderHook(() => store.usePreference("modules.retentionScope")).result.current[0]).toBe("all")

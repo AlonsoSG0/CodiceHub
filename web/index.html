@@ -17,12 +17,14 @@
         try { settings = JSON.parse(localStorage.getItem("chub.settings")); } catch { /* Adopt legacy settings below. */ }
         const storedTheme = settings && typeof settings === "object" && !Array.isArray(settings)
           ? settings["appearance.theme"] : localStorage.getItem("chub-theme");
-        const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-        const theme = storedTheme === "atripp" ? "atripp" : storedTheme === "dark" || (storedTheme !== "light" && prefersDark) ? "dark" : "light";
+        const theme = storedTheme === "system"
+          ? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")
+          : storedTheme === "light" || storedTheme === "dark" ? storedTheme : "atripp";
         document.documentElement.classList.add(theme);
         document.documentElement.style.colorScheme = theme === "light" ? "light" : "dark";
       } catch {
-        // The CSS media query still supplies the system theme when storage is unavailable.
+        document.documentElement.classList.add("atripp");
+        document.documentElement.style.colorScheme = "dark";
       }
     </script>
   </head>

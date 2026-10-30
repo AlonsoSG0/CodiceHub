@@ -109,13 +109,14 @@ describe("app shell", () => {
     window.history.replaceState({}, "", "/notes");
     render(<App />);
 
-    fireEvent.click(screen.getByRole("button", { name: "Switch to dark mode" }));
+    // A fresh profile lands on atripp now, so the first step of the cycle is light.
+    fireEvent.click(screen.getByRole("button", { name: "Switch to light mode" }));
 
-    expect(document.documentElement.classList.contains("dark")).toBe(true);
-    expect(JSON.parse(window.localStorage.getItem("chub.settings") ?? "{}")).toMatchObject({ "appearance.theme": "dark" });
-    expect(screen.getByRole("button", { name: "Switch to Atripp theme" })).toBeTruthy();
+    expect(document.documentElement.classList.contains("light")).toBe(true);
+    expect(JSON.parse(window.localStorage.getItem("chub.settings") ?? "{}")).toMatchObject({ "appearance.theme": "light" });
+    expect(screen.getByRole("button", { name: "Switch to dark mode" })).toBeTruthy();
     // The toggle is icon only; its accessible name carries the meaning.
-    expect(screen.getByRole("button", { name: "Switch to Atripp theme" }).textContent).toBe("");
+    expect(screen.getByRole("button", { name: "Switch to dark mode" }).textContent).toBe("");
   });
 
   it("applies a stored theme when the app mounts", () => {
