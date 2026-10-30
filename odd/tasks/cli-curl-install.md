@@ -86,3 +86,14 @@ L6 (independent verification, blocker found and closed): `gentle-ai-verify` retu
 L5 (open, T7): delivery needs the user's go-ahead, because this repository commits only on request: commit the
 work, bump the root `package.json` to 0.4.0, tag `v0.4.0`, push, flip the repository to public and let the workflow
 publish. Until then the curl URL in the README points at a file that is only on disk.
+
+L7 (post-delivery CI fixes, after the first two runs): the v0.4.0 run built all four targets and then failed in
+`publish`, because that job has no checkout and `gh release create` cannot resolve a repository from `release/`;
+the fix names it with `--repo "$GITHUB_REPOSITORY"`. No release had been published, so the user chose to cut 0.4.1
+rather than move the tag; `v0.4.1` published and the anonymous `curl | sh` line installed a working 0.4.1.
+Then the runner reported the Node 20 deprecation for the pinned actions: moved to the majors that run on node24
+(checkout v7, setup-node v7, upload-artifact v7, download-artifact v8, pnpm/action-setup v6; setup-bun v2 was
+already node24). Checked before moving: every input we pass still exists in the new major's `action.yml`, setup-node
+v7 enables automatic caching only for npm and only when no explicit `cache:` is given, download-artifact v8 only
+tightens digest mismatches into errors, and checkout's breaking change concerns `pull_request_target`, which this
+tag-only workflow never uses. The bump is exercised by the next tag, not by the 0.4.1 run.
