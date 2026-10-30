@@ -12,6 +12,7 @@ import { day, routine, week } from "./commands/routine.js";
 import { search } from "./commands/search.js";
 import { todo } from "./commands/todo.js";
 import { dataHome, extractWeb, openData } from "./context.js";
+import { openBrowser } from "./open.js";
 import { OpsError } from "./ops.js";
 
 /** One entry per product module. Adding a module is one import and one entry. */
@@ -100,9 +101,7 @@ async function serve(config: { port: number; host: string; open: boolean }): Pro
   });
 
   console.log(`chub listening at http://${config.host}:${server.port}`);
-  if (config.open) {
-    Bun.spawn(["xdg-open", `http://${config.host}:${server.port}`], { stdout: "ignore", stderr: "ignore" });
-  }
+  if (config.open) openBrowser(`http://${config.host}:${server.port}`);
   let stopping = false;
   const shutdown = async () => {
     if (stopping) return;
