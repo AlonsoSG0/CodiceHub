@@ -55,8 +55,11 @@ other change to the data home, migrations or command surface.
 no subas version aun". `install.ps1` mirrors the shell installer against the same release contract: the same `.gz`
 assets and `SHA256SUMS`, the same `CHUB_INSTALL_BASE_URL` and `CHUB_INSTALL_DIR` environment, a SHA-256 check before
 installing anything, `chub.exe` into `%LOCALAPPDATA%\Programs\chub` (or `-Dir`), a PATH warning, and a temp directory
-that is removed on every exit. The data home on Windows is `%LOCALAPPDATA%\chub`. Because no Windows machine can run
-it here, both READMEs call it experimental and no release is cut in this delivery.
+that is removed on every exit. The data home on Windows is `%LOCALAPPDATA%\chub`. Because no Windows machine can
+run it here, the Windows path ships with a disclaimer in three places — a blockquote in both READMEs and a warning
+line that `install.ps1` prints before it downloads anything — and **none of the three is removed until the user
+confirms a successful run on Windows**: install, start, browser and a re-install over the running copy. 0.4.3 is the
+first release that publishes the Windows asset, cut only so that test can happen.
 
 ## Tasks
 
@@ -134,3 +137,11 @@ tests), and `chub --help` says so. `cd cli && bun run test` → 35 pass, 0 fail;
 No version bump and no tag, per the instruction.
 Unproven on purpose: there is no PowerShell in this environment, so `install.ps1` is reviewed, not executed. The
 first real test is a Windows machine.
+
+L11 (user, verbatim): "Sube la version yo lo pruebo en una maquina windows, pon un disclaimer ahora y hasta que yo
+lo purbe ese disclaimer no se quita".
+
+L12 (evidence): version 0.4.3 carries the first Windows asset. The disclaimer lives in three places and all three
+outlive this release: the blockquote in `README.md` and `README.es.md`, and the `Write-Warning` at the top of
+`install.ps1`. Removing them is a separate task, gated on the user reporting a successful Windows run — install,
+start, browser, and a re-install over the running copy.

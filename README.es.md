@@ -65,8 +65,12 @@ Correrlo otra vez actualiza en el lugar, `--version 0.4.2` fija un release y `--
 curl -fsSL https://raw.githubusercontent.com/AlonsoSG0/CodiceHub/main/install.sh | sh -s -- --help
 ```
 
-**En Windows** — el mismo release, PowerShell en lugar de un shell. Tomalo como experimental: instala y verifica,
-pero nadie lo corrió todavía en una máquina Windows de verdad.
+**En Windows** — el mismo release, PowerShell en lugar de un shell.
+
+> ⚠️ **Disclaimer: sin verificar en Windows.** Nadie corrió todavía este instalador ni este build en una máquina
+> Windows de verdad. Se publica para poder probarlo — tomá una descarga fallida, un arranque fallido o una base
+> bloqueada como resultado esperable hasta entonces. **Este disclaimer queda hasta que una corrida exitosa en
+> Windows lo confirme**, y lo mismo vale para el que imprime `install.ps1`.
 
 ```powershell
 irm https://raw.githubusercontent.com/AlonsoSG0/CodiceHub/main/install.ps1 | iex

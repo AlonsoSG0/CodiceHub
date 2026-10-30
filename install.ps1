@@ -35,6 +35,10 @@ function Fail([string] $Message) {
 $root = if ($BaseUrl) { $BaseUrl } elseif ($env:CHUB_INSTALL_BASE_URL) { $env:CHUB_INSTALL_BASE_URL } else { "https://github.com/AlonsoSG0/CodiceHub" }
 $target = if ($Dir) { $Dir } elseif ($env:CHUB_INSTALL_DIR) { $env:CHUB_INSTALL_DIR } else { Join-Path $env:LOCALAPPDATA "Programs\chub" }
 
+# The Windows path is published for testing, not because it is proven. Remove this disclaimer only once a real
+# Windows run has confirmed install, start, browser and re-install, and the same note is gone from both READMEs.
+Write-Warning "chub for Windows is untested: no one has run this installer or this build on a real Windows machine yet. If something fails, that is the expected outcome until it is verified."
+
 # ARM64 Windows reports AMD64 to a 32-bit process, so the wider variable wins.
 $machine = if ($env:PROCESSOR_ARCHITEW6432) { $env:PROCESSOR_ARCHITEW6432 } else { $env:PROCESSOR_ARCHITECTURE }
 switch ($machine) {

@@ -65,8 +65,12 @@ Running it again upgrades in place, `--version 0.4.2` pins a release and `--dir`
 curl -fsSL https://raw.githubusercontent.com/AlonsoSG0/CodiceHub/main/install.sh | sh -s -- --help
 ```
 
-**On Windows** — the same release, PowerShell instead of a shell. Treat this one as experimental: it installs and
-verifies, but nobody has run it on a real Windows machine yet.
+**On Windows** — the same release, PowerShell instead of a shell.
+
+> ⚠️ **Disclaimer: not verified on Windows.** Nobody has run this installer or this build on a real Windows machine
+> yet. It is published so it can be tested — treat a failed download, a failed start or a locked database as
+> expected until then. **This disclaimer stays until a successful Windows run confirms it**, and so does the one
+> `install.ps1` prints.
 
 ```powershell
 irm https://raw.githubusercontent.com/AlonsoSG0/CodiceHub/main/install.ps1 | iex
