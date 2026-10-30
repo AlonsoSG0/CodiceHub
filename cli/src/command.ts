@@ -73,3 +73,50 @@ export function section(value?: string): "habits" | "books" | undefined {
 export function print(value: unknown, json: boolean): void {
   console.log(json ? JSON.stringify(value, null, 2) : String(value));
 }
+
+/** The loopback hosts a server may bind. Anything else would expose the workspace to the network. */
+const loopbackHosts = ["127.0.0.1", "localhost", "::1"];
+
+export type ServerOptions = {
+  port: number;
+  host: string;
+  /** Whether the caller should open a browser; `--no-open` clears it. */
+  open: boolean;
+  /** Switches the caller asked for, so a command can accept `--json` without re-parsing argv. */
+  flags: Record<string, boolean>;
+  /** Only the options the caller actually typed, so `restart` can fall back to the running instance. */
+  given: { port?: number; host?: string };
+};
+
+/**
+ * Parse the options shared by the server commands: `chub`, `start` and `restart` all bind a port and a host the same
+ * way. A typo is a usage error rather than a silently ignored argument.
+ */
+export function serverOptions(args: string[], switches: string[] = []): ServerOptions {
+  const result: ServerOptions = {
+    port: Number(process.env.PORT ?? 3000),
+    host: process.env.HOST ?? "127.0.0.1",
+    open: true,
+    flags: {},
+    given: {},
+  };
+  for (let i = 0; i < args.length; i += 1) {
+    const arg = args[i] ?? "";
+    if (arg === "--no-open") result.open = false;
+    else if (arg === "--port") {
+      const value = args[++i];
+      if (value === undefined) throw new UsageError("--port needs a port");
+      result.port = Number(value);
+      result.given.port = result.port;
+    } else if (arg === "--host") {
+      const value = args[++i];
+      if (value === undefined) throw new UsageError("--host needs a host");
+      result.host = value;
+      result.given.host = value;
+    } else if (arg.startsWith("--") && switches.includes(arg.slice(2))) result.flags[arg.slice(2)] = true;
+    else throw new UsageError(`Unknown option: ${arg}`);
+  }
+  if (!Number.isInteger(result.port) || result.port < 0 || result.port > 65535) throw new UsageError("Invalid port");
+  if (!loopbackHosts.includes(result.host)) throw new UsageError("Host must be a loopback address");
+  return result;
+}

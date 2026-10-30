@@ -84,6 +84,17 @@ test("--version and -v print the version without touching the data home", async 
   expect(await Bun.file(unopened).exists()).toBe(false);
 });
 
+test("the global version flag does not swallow the one the update command takes", async () => {
+  home = await mkdtemp(join(tmpdir(), "chub-version-flags-"));
+
+  // `chub update --version <v>` pins a release, so the flag has to reach the command instead of printing ours.
+  const result = await run(["update", "--version", "not-a-release"]);
+
+  expect(result.exitCode).toBe(2);
+  expect(result.stdout).toBe("");
+  expect(result.stderr).toContain("--version needs a release version X.Y.Z");
+});
+
 test("an unknown command exits 2 with the message on stderr", async () => {
   const result = await run(["nope"]);
   expect(result.exitCode).toBe(2);

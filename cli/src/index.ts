@@ -2,21 +2,43 @@ import { mkdir, stat } from "node:fs/promises";
 import { join, resolve, sep } from "node:path";
 import { app } from "../../server/src/app.js";
 import pkg from "../../package.json" with { type: "json" };
-import { UsageError, type Command } from "./command.js";
+import { UsageError, serverOptions, type Command } from "./command.js";
 import { backup, backups } from "./commands/backup.js";
 import { exportCommand } from "./commands/export.js";
 import { habits } from "./commands/habits.js";
 import { note, notes } from "./commands/notes.js";
 import { pref, prefs } from "./commands/prefs.js";
 import { day, routine, week } from "./commands/routine.js";
+import { restart, start, status, stop } from "./commands/server.js";
 import { search } from "./commands/search.js";
 import { todo } from "./commands/todo.js";
+import { update } from "./commands/update.js";
 import { dataHome, extractWeb, openData } from "./context.js";
 import { openBrowser } from "./open.js";
 import { OpsError } from "./ops.js";
+import { clearState, serverLogPath, serverUrl, writeState, type ServerState } from "./server-state.js";
 
 /** One entry per product module. Adding a module is one import and one entry. */
-const commands: Command[] = [search, notes, note, todo, habits, day, week, routine, prefs, pref, backup, backups, exportCommand];
+const commands: Command[] = [
+  search,
+  notes,
+  note,
+  todo,
+  habits,
+  day,
+  week,
+  routine,
+  prefs,
+  pref,
+  backup,
+  backups,
+  exportCommand,
+  status,
+  start,
+  stop,
+  restart,
+  update,
+];
 
 function usage(): string {
   const lines = ["Usage: chub [command] [options]", "", "Commands:"];
@@ -38,32 +60,6 @@ function usage(): string {
     "  CHUB_HOME  Data directory (default: ~/.local/share/chub, or %LOCALAPPDATA%\\chub on Windows)",
   );
   return lines.join("\n");
-}
-
-function serverOptions(args: string[]) {
-  const result = {
-    port: Number(process.env.PORT ?? 3000),
-    host: process.env.HOST ?? "127.0.0.1",
-    open: true,
-  };
-  for (let i = 0; i < args.length; i += 1) {
-    const arg = args[i] ?? "";
-    if (arg === "--no-open") result.open = false;
-    else if (arg === "--port") {
-      const value = args[++i];
-      if (value === undefined) throw new UsageError("--port needs a port");
-      result.port = Number(value);
-    } else if (arg === "--host") {
-      const value = args[++i];
-      if (value === undefined) throw new UsageError("--host needs a host");
-      result.host = value;
-    } else throw new UsageError(`Unknown option: ${arg}`);
-  }
-  if (!Number.isInteger(result.port) || result.port < 0 || result.port > 65535) throw new UsageError("Invalid port");
-  if (!["127.0.0.1", "localhost", "::1"].includes(result.host)) {
-    throw new UsageError("Host must be a loopback address");
-  }
-  return result;
 }
 
 async function serve(config: { port: number; host: string; open: boolean }): Promise<void> {
@@ -100,14 +96,32 @@ async function serve(config: { port: number; host: string; open: boolean }): Pro
     },
   });
 
-  console.log(`chub listening at http://${config.host}:${server.port}`);
-  if (config.open) openBrowser(`http://${config.host}:${server.port}`);
+  // Bun reports the port it actually bound, which is what matters when the caller asked for port 0.
+  const port = server.port ?? config.port;
+  const url = serverUrl(config.host, port);
+  // Record what a second invocation needs to describe and stop this process. Invisible to a foreground user, and the
+  // only thing that makes `chub status` work against a server someone started by hand.
+  const state: ServerState = {
+    runId: process.env.CHUB_RUN_ID ?? crypto.randomUUID(),
+    pid: process.pid,
+    host: config.host,
+    port,
+    url,
+    version: pkg.version,
+    startedAt: new Date().toISOString(),
+    logPath: serverLogPath(home),
+  };
+  await writeState(state, home);
+
+  console.log(`chub listening at ${url}`);
+  if (config.open) openBrowser(url);
   let stopping = false;
   const shutdown = async () => {
     if (stopping) return;
     stopping = true;
     await server.stop(true);
     close();
+    await clearState(home, state.runId);
   };
   process.once("SIGINT", shutdown);
   process.once("SIGTERM", shutdown);
@@ -119,7 +133,8 @@ async function main(): Promise<void> {
     console.log(usage());
     return;
   }
-  if (args.includes("--version") || args.includes("-v")) {
+  // Only as the first argument: `chub update --version 0.4.0` has to reach the command, which pins a release.
+  if (args[0] === "--version" || args[0] === "-v") {
     console.log(pkg.version);
     return;
   }

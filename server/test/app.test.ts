@@ -9,3 +9,12 @@ describe("GET /api/health", () => {
     expect(await response.text()).toBe('{"status":"ok"}');
   });
 });
+
+describe("GET /api/server", () => {
+  it("answers with the pid serving it, so the CLI never signals a guess", async () => {
+    const response = await app.request("/api/server");
+
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ pid: process.pid });
+  });
+});

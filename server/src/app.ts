@@ -22,6 +22,8 @@ function isPathUnder(path: string, prefix: string): boolean {
 
 export const app = new Hono<AppEnv>()
   .get("/api/health", (c) => c.json({ status: "ok" }, 200))
+  // Who is serving, for the CLI: a recorded pid is only signalled when this answers with the same one.
+  .get("/api/server", (c) => c.json({ pid: process.pid }, 200))
   .route("/api", createPagesRoutes())
   .route("/api", createPreferencesRoutes())
   .route("/api", createBackupRoutes())
