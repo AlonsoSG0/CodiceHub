@@ -10,13 +10,15 @@ a credential. User words: "Hacer público el repo". Every download in `install.s
 GitHub: `raw.githubusercontent.com/<owner>/<repo>/main/install.sh` for the script and
 `https://github.com/AlonsoSG0/CodiceHub/releases/...` for the artifacts. No token, no `gh` dependency.
 
-**S2 — Four targets, built from one tag.** User words: "Los cuatro (linux/darwin × x64/arm64)". The release
-publishes exactly these assets, gzipped, plus a checksum file:
+**S2 — Five targets, built from one tag.** The user first said "Los cuatro (linux/darwin × x64/arm64)" and later
+asked for Windows on top: "ok ok si genial, agrega eso". The release publishes exactly these assets, gzipped, plus a
+checksum file:
 
 - `chub-linux-x64.gz`
 - `chub-linux-arm64.gz`
 - `chub-darwin-x64.gz`
 - `chub-darwin-arm64.gz`
+- `chub-windows-x64.gz`
 - `SHA256SUMS`
 
 **S3 — Update means re-running the script.** User words: "No: reinstalar con el script". The binary gains no
@@ -46,8 +48,15 @@ taking the server down.
 **S7 — Testable without the network.** `install.sh` honours `CHUB_INSTALL_BASE_URL`, so its release paths can be
 served from a local fixture in tests; the production URL stays the default and tests never reach GitHub.
 
-**S8 — Out of scope.** Windows (`.ps1`), `chub upgrade`, Homebrew, npm publication, code signing, and any change to
-the data home, migrations or the command surface.
+**S8 — Out of scope.** `chub upgrade`, Homebrew, npm publication, code signing, a Windows `arm64` asset, and any
+other change to the data home, migrations or command surface.
+
+**S9 — Windows installs, and says it is unproven.** User words: "ok ok si genial, agrega eso, y actualiza el readme,
+no subas version aun". `install.ps1` mirrors the shell installer against the same release contract: the same `.gz`
+assets and `SHA256SUMS`, the same `CHUB_INSTALL_BASE_URL` and `CHUB_INSTALL_DIR` environment, a SHA-256 check before
+installing anything, `chub.exe` into `%LOCALAPPDATA%\Programs\chub` (or `-Dir`), a PATH warning, and a temp directory
+that is removed on every exit. The data home on Windows is `%LOCALAPPDATA%\chub`. Because no Windows machine can run
+it here, both READMEs call it experimental and no release is cut in this delivery.
 
 ## Tasks
 
@@ -60,6 +69,10 @@ the data home, migrations or the command surface.
 | T5 | S1, S3, S4 | inline | none | README (and README.es.md) install section replacing "build it yourself" as the primary path |
 | T6 | S2, S4 | inline | none | Prove it locally: cross-compile all four targets, then run `install.sh` end to end against a fixture |
 | T7 | S1, S5 | parent | — | Delivery: commit, bump to 0.4.0, tag, push, flip the repository to public and watch the release |
+| T8 | S9 | inline | none | `%LOCALAPPDATA%\chub` as the Windows data home, with a test |
+| T9 | S9 | inline | none | `install.ps1` at the repository root |
+| T10 | S2 | inline | none | `bun-windows-x64` in the matrix and in the publish checks |
+| T11 | S9 | inline | none | Document the Windows path as experimental in both READMEs |
 
 ## Log
 
@@ -107,3 +120,17 @@ Then, on the user's instruction, the wave was committed (theme default atripp, H
 and version) after `pnpm --filter @chub/web test` (445 tests) and a root typecheck came back clean, and the installer
 stopped leaving garbage: the server now drops every `runtime/<hash>` but its own on start (`pruneRuntime`), which
 takes the six accumulated extractions from 19 MB back to 3.3 MB. `cd cli && bun run test` → 31 pass, 0 fail.
+
+L9 (user, verbatim): "ok ok si genial, agrega eso, y actualiza el readme, no subas version aun".
+
+L10 (evidence for S2/S9): `bun build --compile --target=bun-windows-x64` produces a PE32+ x86-64 executable from this
+Linux box (102 MB), so the Windows asset is not a build problem. Added `chub-windows-x64` to the matrix, to the
+arrival check and to the `SHA256SUMS` line count (4 → 5); the five-asset gate was re-simulated locally: 5/5 present
+passes with `sha256sum --check --strict`, and removing `chub-windows-x64.sha256` blocks it. Added `install.ps1`, which
+reuses the shell installer's contract instead of inventing one: same `.gz` + `SHA256SUMS`, same two environment
+overrides, SHA-256 verified before anything is written, `chub.exe` into `%LOCALAPPDATA%\Programs\chub`, temp
+directory removed in a `finally`. Data home on Windows is now `%LOCALAPPDATA%\chub` (`dataHome(env, platform)`, four
+tests), and `chub --help` says so. `cd cli && bun run test` → 35 pass, 0 fail; root `pnpm typecheck` clean.
+No version bump and no tag, per the instruction.
+Unproven on purpose: there is no PowerShell in this environment, so `install.ps1` is reviewed, not executed. The
+first real test is a Windows machine.

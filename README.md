@@ -50,7 +50,7 @@ pnpm typecheck
 Development keeps its own throwaway database in `server/data`, so experimenting never touches the data you actually
 use.
 
-**As the real thing** — one line, no toolchain (Linux and macOS):
+**As the real thing** — one line, no toolchain:
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/AlonsoSG0/CodiceHub/main/install.sh | sh
@@ -59,11 +59,22 @@ chub                                     # serves the workspace and opens the br
 
 The installer reads your OS and architecture (`linux`/`darwin` × `x64`/`arm64`), downloads that release asset,
 checks its SHA-256 against the published `SHA256SUMS` and installs `chub` into `~/.local/bin` (or `$XDG_BIN_HOME`).
-Running it again upgrades in place, `--version 0.4.0` pins a release and `--dir` picks another directory:
+Running it again upgrades in place, `--version 0.4.2` pins a release and `--dir` picks another directory:
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/AlonsoSG0/CodiceHub/main/install.sh | sh -s -- --help
 ```
+
+**On Windows** — the same release, PowerShell instead of a shell. Treat this one as experimental: it installs and
+verifies, but nobody has run it on a real Windows machine yet.
+
+```powershell
+irm https://raw.githubusercontent.com/AlonsoSG0/CodiceHub/main/install.ps1 | iex
+```
+
+It installs `chub.exe` into `%LOCALAPPDATA%\Programs\chub`, verifies the same `SHA256SUMS`, and warns when that
+directory is not on `PATH`. Stop `chub` before upgrading it — Windows cannot replace a running executable. The data
+home there is `%LOCALAPPDATA%\chub`.
 
 **From source** — when you are working on chub itself:
 
@@ -72,8 +83,9 @@ pnpm --filter @chub/cli build:binary     # → cli/dist/chub
 install -m755 cli/dist/chub ~/.local/bin/chub
 ```
 
-The binary stores everything under `~/.local/share/chub` (override with `CHUB_HOME`): the database, uploads, the
-extracted web build and the backups. It listens on `127.0.0.1:3000` and nothing else.
+The binary stores everything under `~/.local/share/chub` (`%LOCALAPPDATA%\chub` on Windows; override with
+`CHUB_HOME`): the database, uploads, the extracted web build and the backups. It listens on `127.0.0.1:3000` and
+nothing else.
 
 ## The CLI
 
