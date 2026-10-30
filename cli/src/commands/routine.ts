@@ -1,5 +1,6 @@
 import { UsageError, countArgs, dateOption, parseOptions, withData, type Command } from "../command.js";
-import { call, resolveDay } from "../ops.js";
+import { call, OpsError, resolveDay } from "../ops.js";
+import { resolveNamed } from "../resolve.js";
 
 type Block = {
   id: string;
@@ -11,7 +12,57 @@ type Block = {
   link: { kind: string; id: string } | null;
 };
 type Occurrence = { blockId: string; date: string; status: string };
-type Snapshot = { settings: { weekStartsOn: number }; blocks: Block[]; occurrences: Occurrence[] };
+type Mirror = { blockId: string; date: string; target: string; targetId: string; written: boolean; reason: string | null };
+type Snapshot = { settings: { weekStartsOn: number }; blocks: Block[]; occurrences: Occurrence[]; mirrors: Mirror[] };
+
+const routineLines = ["routine status <block> <status> [--date <day>] [--note <text>] [--json]"];
+
+export const routine: Command = {
+  name: "routine",
+  lines: routineLines,
+  async run(argv) {
+    const verb = argv[0];
+    if (verb === undefined) {
+      console.log(["Usage: chub routine <command>", "", "Commands:", ...routineLines.map((line) => `  ${line.replace(/^routine /, "")}`)].join("\n"));
+      return;
+    }
+    if (verb !== "status") throw new UsageError(`Unknown routine command: ${verb}`);
+    const { args, values, flags } = parseOptions(argv.slice(1), ["date", "note"], ["json"]);
+    countArgs(args, 2, "routine status");
+    const [name, status] = args as [string, string];
+    if (!["pending", "done", "missed", "excused", "skipped"].includes(status)) {
+      throw new UsageError("status needs pending, done, missed, excused or skipped");
+    }
+    const override = dateOption(values.date);
+    if (override !== undefined) dateValue(override);
+    await withData(async (db) => {
+      const { date } = await resolveDay(db, override);
+      const snapshot = await call(db, "/api/routine") as Snapshot;
+      const blocks = snapshot.blocks.filter((block) => block.weekday === dateValue(date).getUTCDay());
+      let block: Block;
+      try {
+        block = resolveNamed(blocks, name, (row) => row.title, "block");
+      } catch (error) {
+        if (!(error instanceof OpsError) || error.code !== "ambiguous") throw error;
+        const needle = name.trim().toLowerCase();
+        const exact = blocks.filter((row) => row.title.trim().toLowerCase() === needle);
+        const candidates = exact.length ? exact : blocks.filter((row) => row.title.toLowerCase().includes(needle));
+        throw new OpsError("ambiguous", `"${name}" is ambiguous: ${candidates.map((row) => `${row.title} ${row.start}-${row.end} (${row.id})`).join(", ")}`);
+      }
+      const result = await call(db, `/api/routine/blocks/${encodeURIComponent(block.id)}/occurrences/${date}`, {
+        method: "PUT",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ status, note: values.note }),
+      }) as Snapshot;
+      if (flags.json) console.log(JSON.stringify(result, null, 2));
+      else {
+        const mirror = result.mirrors.find((row) => row.blockId === block.id && row.date === date);
+        const detail = mirror ? `; ${mirror.target}:${mirror.targetId} ${mirror.written ? "mirrored" : `not mirrored${mirror.reason ? ` (${mirror.reason})` : ""}`}` : "; no mirror";
+        console.log(`${block.title}: ${status} (${date})${detail}`);
+      }
+    });
+  },
+};
 
 function dateValue(day: string): Date {
   const date = new Date(`${day}T00:00:00Z`);

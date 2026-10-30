@@ -65,6 +65,15 @@ compute a level, a score or a "missed because the day passed" verdict: that logi
 `cleanup` and `seed` from `cli/test/helpers.ts`, with `cleanup()` in `afterEach`. `run` already pins `CHUB_HOME` to the
 isolated home so nothing can reach the real data. Existing tests must keep passing untouched.
 
+**S13 — `chub routine status <block> <status> [--date <day>] [--note <text>] [--json]`.** Records one block's
+occurrence through `PUT /api/routine/blocks/:id/occurrences/:date` with `{ status, note? }`. `<status>` is exactly
+`pending`, `done`, `missed`, `excused` or `skipped`; anything else is a `UsageError`. The date defaults to the
+workspace day (`resolveDay`) and must fall on the block's weekday, which the API enforces. `<block>` resolves with S3
+against the blocks of that weekday only, and an ambiguity reports each candidate with its time range, so two blocks
+sharing a title stay distinguishable. The API refuses a day older than the edit window (`date_frozen`); that surfaces
+as an `OpsError` at exit `1`. Recording a status mirrors into a linked habit or task, and a mirror failure never fails
+the request: the human line reports what was recorded and what the mirror did, read from the `mirrors` of the response.
+
 **S12 — Out of scope.** Restoring a backup, purging pages, editing rich content, recording routine statuses, the
 projects, books and goals modules, and any change to `server/`, `web/` or `README.md`. No commits: `AGENTS.md` forbids
 them unless the user asks.
@@ -79,6 +88,7 @@ them unless the user asks.
 | T4 | S1-S3, S9, S11 | worker | none | `commands/notes.ts` + its test |
 | T5 | S1, S2, S10, S11 | worker | none | `commands/routine.ts` + its test |
 | T6 | S1, S2 | parent | none | Register every module in `index.ts`, build, run `bun test`, fix what fails, update the README |
+| T7 | S1-S3, S11, S13 | worker | none | `commands/routine.ts`: the `status` verb, plus its test |
 
 ## Log
 

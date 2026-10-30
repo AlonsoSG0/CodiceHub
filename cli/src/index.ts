@@ -8,14 +8,14 @@ import { exportCommand } from "./commands/export.js";
 import { habits } from "./commands/habits.js";
 import { note, notes } from "./commands/notes.js";
 import { pref, prefs } from "./commands/prefs.js";
-import { day, week } from "./commands/routine.js";
+import { day, routine, week } from "./commands/routine.js";
 import { search } from "./commands/search.js";
 import { todo } from "./commands/todo.js";
 import { dataHome, extractWeb, openData } from "./context.js";
 import { OpsError } from "./ops.js";
 
 /** One entry per product module. Adding a module is one import and one entry. */
-const commands: Command[] = [search, notes, note, todo, habits, day, week, prefs, pref, backup, backups, exportCommand];
+const commands: Command[] = [search, notes, note, todo, habits, day, week, routine, prefs, pref, backup, backups, exportCommand];
 
 function usage(): string {
   const lines = ["Usage: chub [command] [options]", "", "Commands:"];
