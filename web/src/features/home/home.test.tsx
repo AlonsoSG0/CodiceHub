@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest"
 import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react"
 import { MemoryRouter } from "react-router-dom"
 import { ThemeProvider } from "@/app/theme-provider"
+import { resetPreferenceCache } from "@/features/settings/preferences"
 import { Clock } from "./clock"
 import { HomePage } from "./home-page"
 import { Button } from "@/components/ui/button"
@@ -100,8 +101,17 @@ describe("Home", () => {
     expect(screen.getByRole("note").textContent).toContain("Welcome home")
   })
 
+  it("resolves a fresh install to atripp", () => {
+    window.localStorage.clear()
+    resetPreferenceCache()
+    render(<ThemeProvider><MemoryRouter><HomePage /></MemoryRouter></ThemeProvider>)
+    expect(document.documentElement).toHaveClass("atripp")
+  })
+
   it("shows the decorative orbit only in atripp", () => {
     window.localStorage.clear()
+    window.localStorage.setItem("chub.settings", JSON.stringify({ "appearance.theme": "light" }))
+    resetPreferenceCache()
     const { container } = render(<ThemeProvider><MemoryRouter><HomePage /></MemoryRouter></ThemeProvider>)
     const orbit = () => container.querySelector('svg[data-home-decoration]')
     expect(orbit()).toBeNull()
@@ -122,6 +132,8 @@ describe("Home", () => {
 
   it("offers the same theme toggle the notes screen has, and switches the theme", () => {
     window.localStorage.clear()
+    window.localStorage.setItem("chub.settings", JSON.stringify({ "appearance.theme": "light" }))
+    resetPreferenceCache()
     document.documentElement.classList.remove("dark", "light")
     render(<ThemeProvider><MemoryRouter><HomePage /></MemoryRouter></ThemeProvider>)
 
