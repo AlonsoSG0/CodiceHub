@@ -49,6 +49,11 @@ pnpm --filter @chub/cli typecheck
 
 - `cli/src/index.ts` is a dispatcher: a `commands: Command[]` registry plus `serve()`. A new command is a new file in
   `cli/src/commands/` exporting `{ name, lines, run }`, plus one line in the registry.
+- `cli/src/server-state.ts` is the lifecycle seam: it records `server.json` (pid, url, version, started at), probes
+  `GET /api/server` before signalling any pid, and owns the log path. `chub status|start|stop|restart` live in
+  `cli/src/commands/server.ts`, and `start` spawns this binary detached with its stdio on `logs/server.log` — that
+  detachment is what frees the terminal, so it is not a detail to rearrange. `chub update` lives in `cli/src/update.ts`,
+  replaces the installed binary and never restarts it.
 - `cli/src/ops.ts` is the **only** data seam. Commands call the Hono app in process — `call`, `callText` — never SQL,
   never a repository, never a socket, so a command works whether or not `chub` is running. Do not bypass it.
 - `cli/src/resolve.ts` holds the hybrid addressing rule: an id-shaped argument is an id, anything else is a title,
@@ -176,8 +181,9 @@ chunk of their own and nothing in the entry.
   client.
 - `server/src/routes/**` — Hono routes. `server/src/pages/**` — the page repository. `server/src/db/**` — schema and
   migrations. Also `search/`, `export/`, `uploads/`, `static/`.
-- `cli/src/commands/**` — one file per product module; `cli/src/{ops,command,resolve,context}.ts` — the seam, the
-  helpers, the addressing rule and the data home. `cli/test/**` — the suite, run with `bun test` from `cli/`.
+- `cli/src/commands/**` — one file per product module; `cli/src/{ops,command,resolve,context,server-state}.ts` — the data
+  seam, the helpers, the addressing rule, the data home and the server state. `cli/test/**` — the suite, run with
+  `bun test` from `cli/`.
 - `odd/tasks/<feature>.md` — the feature document for any large piece of work. Read the existing one before
   continuing a feature, and stop before its `## Log` section, which is evidence rather than spec.
 

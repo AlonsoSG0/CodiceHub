@@ -107,6 +107,13 @@ comando que recibe una entidad acepta un id **o** un título, y todos tienen `--
 | `chub prefs` / `chub pref set` | Todas las preferencias guardadas, incluida la zona horaria del espacio |
 | `chub backup` / `chub backups` | Respaldar la base, listar los respaldos |
 | `chub export <página> --out lista.md` | Una página como Markdown |
+| `chub status` / `chub start` / `chub stop` / `chub restart` | Si el servidor corre, levantarlo desacoplado, bajarlo, reiniciarlo |
+| `chub update` | Baja el último release, verifica su checksum y reemplaza este binario |
+
+`chub` solo sirve en primer plano y abre el navegador. `chub start` es ese mismo servidor sin terminal: se desacopla en
+su propio grupo de procesos, imprime la URL que efectivamente tomó y devuelve el prompt, así que podés cerrar la
+ventana y el servidor sigue. Escribe en `~/.local/share/chub/logs/server.log`, y `chub status` te dice dónde.
+`chub update` reemplaza el binario instalado y nunca lo reinicia: `chub restart` es lo que aplica una versión nueva.
 
 ```sh
 chub todo add "llamar al dentista #Recados" --due 2025-03-04
@@ -120,8 +127,10 @@ chub search "orquídea" --json
 ```text
 ~/.local/share/chub/
 ├── chub.db                 SQLite, en modo WAL
+├── server.json             el servidor que corre: pid, url, versión, cuándo arrancó
 ├── uploads/                imágenes que referencian tus notas y las portadas
 ├── backups/                chub-YYYYMMDD-HHMMSS.db, se conservan las tres últimas
+├── logs/server.log         la salida de un servidor levantado con `chub start`
 └── runtime/<hash>/         la web y las migraciones extraídas del binario
 ```
 

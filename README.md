@@ -55,6 +55,7 @@ use.
 ```sh
 curl -fsSL https://raw.githubusercontent.com/AlonsoSG0/CodiceHub/main/install.sh | sh
 chub                                     # serves the workspace and opens the browser
+chub start                               # the same server, detached: prints the URL and frees the terminal
 ```
 
 The installer reads your OS and architecture (`linux`/`darwin` × `x64`/`arm64`), downloads that release asset,
@@ -108,6 +109,14 @@ entity accepts an id **or** a title, and every command has `--json`.
 | `chub prefs` / `chub pref set` | Every stored preference, including the workspace time zone |
 | `chub backup` / `chub backups` | Snapshot the database, list the snapshots |
 | `chub export <page> --out list.md` | A page as Markdown |
+| `chub status` / `chub start` / `chub stop` / `chub restart` | Whether the server runs, run it detached, stop it, restart it |
+| `chub update` | Download the latest release, verify its checksum, replace this binary |
+
+`chub` on its own serves in the foreground and opens the browser. `chub start` is that same server without a
+terminal: it detaches into its own process group, prints the URL it actually bound and returns, so the prompt is free
+and the server survives closing the window. It writes to `~/.local/share/chub/logs/server.log`, and `chub status`
+says where. `chub update` replaces the installed binary and never restarts it — `chub restart` is what applies a new
+version.
 
 ```sh
 chub todo add "call the dentist #Errands" --due 2025-03-04
@@ -121,8 +130,10 @@ chub search "orchid" --json
 ```
 ~/.local/share/chub/
 ├── chub.db                 SQLite, WAL mode
+├── server.json             the running server: pid, url, version, started at
 ├── uploads/                images referenced by your notes and covers
 ├── backups/                chub-YYYYMMDD-HHMMSS.db, newest three kept
+├── logs/server.log         output of a server started with `chub start`
 └── runtime/<hash>/         the web build and migrations extracted from the binary
 ```
 
