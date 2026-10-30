@@ -157,3 +157,11 @@ T6 — `spawnServer` sends `SIGTERM`, waits up to 2 s, escalates to `SIGKILL` an
 `CHUB_START_TIMEOUT_MS` as the test hook; `status --json` answers the same field shape with nulls when nothing runs.
 RED first: 6 passed, 2 failed; GREEN: 8 passed. T7 — see L8. S6 no longer promises a fallback to the release tag,
 because that fallback is exactly what the verifier proved unsafe.
+
+**L11 (release 0.5.0):** the user asked to push the work and keep the disclaimer, then chose a release over a
+correction: version bumped to 0.5.0, suite re-run before tagging (`cli` 55 pass, exit 0, binary reporting 0.5.0),
+`chore: release 0.5.0` committed, and a lightweight tag `v0.5.0` on it, matching how 0.4.4 was cut. The tag run
+(41100360461) sat in `queued` for over six minutes with GitHub reporting all systems operational, the repository
+public and no other run waiting; the `gh run watch` that was supposed to follow it died on repeated API `502`s, not on
+a workflow failure. Nothing was re-tagged, moved or re-dispatched: a delayed release is cheaper than a moved tag.
+The Windows disclaimer is untouched, by instruction.
