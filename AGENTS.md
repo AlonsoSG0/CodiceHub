@@ -6,11 +6,13 @@ environment variables — this file does not repeat them.
 
 ## What this project is
 
-`chub` is a personal, Notion-like workspace. It is a pnpm workspace with two packages:
+`chub` is a personal, Notion-like workspace. It is a pnpm workspace with three packages:
 
 - `web/` (`@chub/web`) — React 19, React Router 7, Vite 6, Tailwind CSS 4, shadcn/ui on the `base-nova` style
   (**Base UI**, not Radix), Tiptap 3 editor, Vitest 3 + Testing Library + jsdom.
 - `server/` (`@chub/server`) — Hono 4 on Node, SQLite through better-sqlite3, Drizzle ORM, Vitest.
+- `cli/` (`@chub/cli`) — the `chub` binary: one Bun build that embeds the API, the web app and the migrations and
+  serves them from the user's own data directory. Also the subcommand CLI (`chub search`, `chub todo`, `chub habits`).
 
 Planned product areas, none of them built yet except the notes editor: notes, habits, books, tasks/Kanban, and a
 customizable home with widgets. The UI foundation for those areas already exists — see the inventory below.
@@ -33,6 +35,30 @@ pnpm --filter @chub/web build
 pnpm --filter @chub/server test
 cd web && pnpm vitest run src/components/ui-kit/ui-kit.test.tsx
 ```
+
+## The CLI
+
+`cli/` is how the app is actually used; `pnpm dev` is how it is developed. The binary is the product: it carries the
+API, the web build and the migrations, and it answers subcommands against the same data home.
+
+```sh
+pnpm --filter @chub/cli build:binary   # web build + asset archive + compile → cli/dist/chub
+pnpm --filter @chub/cli test           # builds, then runs the suite against the compiled binary
+pnpm --filter @chub/cli typecheck
+```
+
+- `cli/src/index.ts` is a dispatcher: a `commands: Command[]` registry plus `serve()`. A new command is a new file in
+  `cli/src/commands/` exporting `{ name, lines, run }`, plus one line in the registry.
+- `cli/src/ops.ts` is the **only** data seam. Commands call the Hono app in process — `call`, `callText` — never SQL,
+  never a repository, never a socket, so a command works whether or not `chub` is running. Do not bypass it.
+- `cli/src/resolve.ts` holds the hybrid addressing rule: an id-shaped argument is an id, anything else is a title,
+  matched exactly and then by unique substring; ambiguity is an error listing the candidates, never a guess.
+- `cli/src/command.ts` holds the shared option parsing and helpers. Do not copy that logic into a module.
+- The binary writes to `CHUB_HOME` (`~/.local/share/chub` by default), never inside the repository.
+- Bun is required for `cli/` only. Root `pnpm build`, `pnpm test` and `pnpm dev` stay on Node, which is what
+  better-sqlite3 and Vitest expect.
+- Every test spawns `cli/dist/chub`, so the build has to run first — which is why `test` builds before testing.
+  `cli/test/helpers.ts` pins `CHUB_HOME` to a temporary directory, so a test can never touch real data.
 
 ## Reuse first — the component inventory
 
@@ -150,6 +176,8 @@ chunk of their own and nothing in the entry.
   client.
 - `server/src/routes/**` — Hono routes. `server/src/pages/**` — the page repository. `server/src/db/**` — schema and
   migrations. Also `search/`, `export/`, `uploads/`, `static/`.
+- `cli/src/commands/**` — one file per product module; `cli/src/{ops,command,resolve,context}.ts` — the seam, the
+  helpers, the addressing rule and the data home. `cli/test/**` — the suite, run with `bun test` from `cli/`.
 - `odd/tasks/<feature>.md` — the feature document for any large piece of work. Read the existing one before
   continuing a feature, and stop before its `## Log` section, which is evidence rather than spec.
 

@@ -2,6 +2,7 @@ import { afterEach, expect, test } from "bun:test";
 import { mkdtemp, rm, stat } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import pkg from "../../package.json" with { type: "json" };
 
 const binary = join(import.meta.dir, "../dist/chub");
 
@@ -78,7 +79,7 @@ test("--version and -v print the version without touching the data home", async 
   for (const flag of ["-v", "--version"]) {
     const result = await run([flag], { CHUB_HOME: unopened });
     expect(result.exitCode).toBe(0);
-    expect(result.stdout.trim()).toBe("0.1.0");
+    expect(result.stdout.trim()).toBe(pkg.version);
   }
   expect(await Bun.file(unopened).exists()).toBe(false);
 });
@@ -123,6 +124,47 @@ test("compiled chub serves the API and web from an isolated data home", async ()
   expect((await fetch(`${restarted}/api/health`)).status).toBe(200);
   expect(await (await fetch(`${restarted}/api/pages/tree`)).text()).toContain("CLI smoke page");
   await stop();
+});
+
+test("extended habits commands operate on API-seeded data", async () => {
+  home = await mkdtemp(join(tmpdir(), "chub-habits-extended-"));
+  const address = await start();
+  const create = async (name: string) => {
+    const response = await fetch(`${address}/api/habits`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ name }) });
+    expect(response.status).toBe(201);
+    return await response.json() as { id: string };
+  };
+  const habit = await create("Reading");
+  await create("Reading notes");
+  const added = await fetch(`${address}/api/habits/${habit.id}/fields`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ kind: "number", label: "Minutes" }) });
+  expect(added.status).toBe(201);
+  await stop();
+  const command = async (...args: string[]) => run(["habits", ...args]);
+  const history = await command("log", "Reading", "--json");
+  expect(history.exitCode).toBe(0);
+  expect(JSON.parse(history.stdout).entries).toEqual([]);
+  expect((await command("set", "Reading", "Minutes", "12")).exitCode).toBe(0);
+  const invalid = await command("set", "Reading", "Minutes", "wrong");
+  expect(invalid.exitCode).toBe(2);
+  expect(invalid.stdout).toBe("");
+  expect(JSON.parse((await command("log", "Reading", "--json")).stdout).entries[0].value).toBe(12);
+  expect((await command("set", "Reading", "Minutes", "--clear")).exitCode).toBe(0);
+  expect(JSON.parse((await command("log", "Reading", "--json")).stdout).entries).toEqual([]);
+  expect((await command("done", "Reading")).exitCode).toBe(0);
+  const undo = await command("undo", "Reading", "--json");
+  expect(undo.exitCode).toBe(0);
+  expect(JSON.parse(undo.stdout).entries[0].value).toBe(false);
+  expect(JSON.parse((await command("log", "Reading", "--json")).stdout).entries).toEqual([]);
+  expect((await command("rename", "Reading", "Books read")).exitCode).toBe(0);
+  expect((await command("archive", "Books read")).exitCode).toBe(0);
+  expect(JSON.parse((await command("list", "--json")).stdout).habits.map((h: { name: string }) => h.name)).not.toContain("Books read");
+  expect(JSON.parse((await command("list", "--archived", "--json")).stdout).habits.map((h: { name: string }) => h.name)).toContain("Books read");
+  expect((await command("unarchive", "Books read")).exitCode).toBe(0);
+  expect((await command("field", "add", "Books read", "Pages", "--kind", "number")).exitCode).toBe(0);
+  expect((await command("field", "update", "Books read", "Pages", "--label", "Pages read")).exitCode).toBe(0);
+  expect((await command("done", "missing")).exitCode).toBe(1);
+  expect((await command("add", "Reading extra")).exitCode).toBe(0);
+  expect((await command("done", "Reading")).exitCode).toBe(1);
 });
 
 test("habits commands read and write the data home without a running server", async () => {

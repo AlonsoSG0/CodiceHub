@@ -5,7 +5,7 @@
   "scripts": {
     "build:assets": "bun scripts/build-assets.ts",
     "build:binary": "pnpm --filter @chub/web build && bun run build:assets && bun build --compile src/index.ts --outfile dist/chub",
-    "test:smoke": "bun run build:binary && bun test",
+    "test": "bun run build:binary && bun test",
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
