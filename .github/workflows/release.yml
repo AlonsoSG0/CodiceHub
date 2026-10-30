@@ -35,16 +35,23 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          # `binary` is the file Bun writes, which is not always the published
+          # name: a Windows target gets `.exe` appended to the outfile.
           - target: bun-linux-x64
             asset: chub-linux-x64
+            binary: chub-linux-x64
           - target: bun-linux-arm64
             asset: chub-linux-arm64
+            binary: chub-linux-arm64
           - target: bun-darwin-x64
             asset: chub-darwin-x64
+            binary: chub-darwin-x64
           - target: bun-darwin-arm64
             asset: chub-darwin-arm64
+            binary: chub-darwin-arm64
           - target: bun-windows-x64
             asset: chub-windows-x64
+            binary: chub-windows-x64.exe
     steps:
       - uses: actions/checkout@v7
         with:
@@ -75,12 +82,12 @@ jobs:
         run: |
           bun build --compile src/index.ts \
             --target=${{ matrix.target }} \
-            --outfile dist/${{ matrix.asset }}
+            --outfile dist/${{ matrix.binary }}
 
       - name: Compress and checksum
         working-directory: cli/dist
         run: |
-          gzip -9 -n -c "${{ matrix.asset }}" \
+          gzip -9 -n -c "${{ matrix.binary }}" \
             > "${{ matrix.asset }}.gz"
           sha256sum "${{ matrix.asset }}.gz" \
             > "${{ matrix.asset }}.sha256"
