@@ -99,4 +99,11 @@ describe("settings page", () => {
     fireEvent.change(field, { target: { value: "Daily reading" } })
     await waitFor(() => expect(api.savePreference).toHaveBeenCalledWith("modules.readingHabit", "Daily reading"))
   })
+
+  it("shows the brand and the workspace version at the end", () => {
+    renderPage()
+    expect(screen.getByText("CodiceHub")).toBeInTheDocument()
+    // The version is __APP_VERSION__, injected by vite.config.ts from the root package.json.
+    expect(screen.getByText(/^\d+\.\d+\.\d+$/)).toBeInTheDocument()
+  })
 })

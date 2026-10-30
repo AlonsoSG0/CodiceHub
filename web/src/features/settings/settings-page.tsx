@@ -256,6 +256,12 @@ export function SettingsPage() {
           </div>
           <LanguageToggle />
         </header>
+        <div className="flex items-center justify-center gap-2.5 pb-7 pt-1">
+          <img src="/brand/CodiceHub_Isotipo.png" alt="" aria-hidden="true" className="size-9" />
+          <span className="text-lg font-semibold tracking-tight text-foreground">CodiceHub</span>
+          <span aria-hidden="true" className="text-muted-foreground/60">·</span>
+          <span className="text-sm text-muted-foreground" data-app-version>{__APP_VERSION__}</span>
+        </div>
         <div className="divide-y divide-border border-y border-border">
           {groups.map((group) => (
             <section key={group} aria-labelledby={`settings-${group.toLowerCase()}`} className="py-5">

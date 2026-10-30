@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { fileURLToPath, URL } from "node:url";
 import tailwindcss from "@tailwindcss/vite";
 import mdx from "@mdx-js/rollup";
@@ -24,9 +25,29 @@ const reactPlugin = react() as unknown as PluginOption;
 // SAFETY: same duplicate-Vite-peer-type cast as mdxPlugin above.
 const tailwindPlugin = tailwindcss() as unknown as PluginOption;
 
+// One number for the product: the root package.json is the single source, and the CLI binary reads the same field.
+// A missing or malformed manifest must fail the build loudly rather than ship a versionless app.
+function readVersion(): string {
+  let manifest: { version?: unknown };
+  try {
+    manifest = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8")) as { version?: unknown };
+  } catch (cause) {
+    throw new Error("Could not read the workspace version from package.json", { cause });
+  }
+  if (typeof manifest.version !== "string" || manifest.version === "") {
+    throw new Error("The workspace package.json has no version field");
+  }
+  return manifest.version;
+}
+
+const version = readVersion();
+
 const config: ViteConfigWithVitest = {
   // SAFETY: the three plugin options are cast above for the duplicate-Vite-peer-type reason stated there.
   plugins: [mdxPlugin, reactPlugin, tailwindPlugin],
+  define: {
+    __APP_VERSION__: JSON.stringify(version),
+  },
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
