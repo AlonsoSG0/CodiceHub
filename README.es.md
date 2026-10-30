@@ -50,12 +50,26 @@ pnpm typecheck
 El modo desarrollo mantiene su propia base descartable en `server/data`, así experimentar nunca toca los datos que
 usás de verdad.
 
-**Como producto real** — compilá el binario y instalalo:
+**Como producto real** — una línea, sin toolchain (Linux y macOS):
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/AlonsoSG0/CodiceHub/main/install.sh | sh
+chub                                     # sirve el espacio y abre el navegador
+```
+
+El instalador lee tu sistema y arquitectura (`linux`/`darwin` × `x64`/`arm64`), baja el asset de ese release,
+compara su SHA-256 contra el `SHA256SUMS` publicado e instala `chub` en `~/.local/bin` (o `$XDG_BIN_HOME`).
+Correrlo otra vez actualiza en el lugar, `--version 0.4.0` fija un release y `--dir` elige otro directorio:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/AlonsoSG0/CodiceHub/main/install.sh | sh -s -- --help
+```
+
+**Desde el código** — cuando estás trabajando en chub mismo:
 
 ```sh
 pnpm --filter @chub/cli build:binary     # → cli/dist/chub
-cp cli/dist/chub ~/.local/bin/chub
-chub                                     # sirve el espacio y abre el navegador
+install -m755 cli/dist/chub ~/.local/bin/chub
 ```
 
 El binario guarda todo bajo `~/.local/share/chub` (se cambia con `CHUB_HOME`): la base, los archivos subidos, la web

@@ -50,12 +50,26 @@ pnpm typecheck
 Development keeps its own throwaway database in `server/data`, so experimenting never touches the data you actually
 use.
 
-**As the real thing** — build the binary and install it:
+**As the real thing** — one line, no toolchain (Linux and macOS):
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/AlonsoSG0/CodiceHub/main/install.sh | sh
+chub                                     # serves the workspace and opens the browser
+```
+
+The installer reads your OS and architecture (`linux`/`darwin` × `x64`/`arm64`), downloads that release asset,
+checks its SHA-256 against the published `SHA256SUMS` and installs `chub` into `~/.local/bin` (or `$XDG_BIN_HOME`).
+Running it again upgrades in place, `--version 0.4.0` pins a release and `--dir` picks another directory:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/AlonsoSG0/CodiceHub/main/install.sh | sh -s -- --help
+```
+
+**From source** — when you are working on chub itself:
 
 ```sh
 pnpm --filter @chub/cli build:binary     # → cli/dist/chub
-cp cli/dist/chub ~/.local/bin/chub
-chub                                     # serves the workspace and opens the browser
+install -m755 cli/dist/chub ~/.local/bin/chub
 ```
 
 The binary stores everything under `~/.local/share/chub` (override with `CHUB_HOME`): the database, uploads, the
