@@ -1,0 +1,141 @@
+name: release
+
+# A release is a tag. The tag must equal the root package.json version:
+# that version is the single source the binary prints, the installer
+# downloads and the release names.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  guard:
+    name: Tag matches package.json
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Fail when the tag and the version disagree
+        run: |
+          expected="v$(node -p "require('./package.json').version")"
+          if [ "$GITHUB_REF_NAME" != "$expected" ]; then
+            echo "::error::tag $GITHUB_REF_NAME != $expected"
+            exit 1
+          fi
+          echo "tag $GITHUB_REF_NAME matches $expected"
+
+  build:
+    name: Build ${{ matrix.asset }}
+    needs: guard
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: bun-linux-x64
+            asset: chub-linux-x64
+          - target: bun-linux-arm64
+            asset: chub-linux-arm64
+          - target: bun-darwin-x64
+            asset: chub-darwin-x64
+          - target: bun-darwin-arm64
+            asset: chub-darwin-arm64
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 25
+          cache: pnpm
+
+      # Pinned to the Bun the binary is developed against: the compiled
+      # artifact embeds this runtime.
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.14
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Build the web bundle and embed the assets
+        run: |
+          pnpm --filter @chub/web build
+          cd cli && bun run build:assets
+
+      - name: Compile
+        working-directory: cli
+        run: |
+          bun build --compile src/index.ts \
+            --target=${{ matrix.target }} \
+            --outfile dist/${{ matrix.asset }}
+
+      - name: Compress and checksum
+        working-directory: cli/dist
+        run: |
+          gzip -9 -n -c "${{ matrix.asset }}" \
+            > "${{ matrix.asset }}.gz"
+          sha256sum "${{ matrix.asset }}.gz" \
+            > "${{ matrix.asset }}.sha256"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.asset }}
+          path: |
+            cli/dist/${{ matrix.asset }}.gz
+            cli/dist/${{ matrix.asset }}.sha256
+          if-no-files-found: error
+
+  publish:
+    name: Publish the release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: release
+          merge-multiple: true
+
+      - name: Check that every target arrived
+        run: |
+          assets="chub-linux-x64 chub-linux-arm64"
+          assets="$assets chub-darwin-x64 chub-darwin-arm64"
+          for asset in $assets; do
+            for part in gz sha256; do
+              if [ ! -s "release/$asset.$part" ]; then
+                echo "::error::missing $asset.$part"
+                exit 1
+              fi
+            done
+          done
+
+      - name: Combine the checksums
+        working-directory: release
+        run: cat ./*.sha256 | sort -k 2 > SHA256SUMS
+
+      # A release nobody can verify is worse than no release: the merged file
+      # must cover exactly the four assets and match them byte for byte.
+      - name: Verify the merged checksums
+        working-directory: release
+        run: |
+          lines=$(wc -l < SHA256SUMS)
+          if [ "$lines" -ne 4 ]; then
+            echo "::error::SHA256SUMS has $lines lines, expected 4"
+            exit 1
+          fi
+          sha256sum --check --strict SHA256SUMS
+
+      - name: Create the release
+        working-directory: release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            --title "$GITHUB_REF_NAME" \
+            --generate-notes \
+            ./*.gz SHA256SUMS
