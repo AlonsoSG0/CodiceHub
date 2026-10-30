@@ -118,3 +118,12 @@ silently choosing the first one.
 
 Not done, on purpose: nothing was installed and nothing was committed (L4 of `cli-habits.md` still applies), and the
 README's command list is the only documentation change.
+
+L6 (evidence, T7). `chub routine status <block> <status> [--date] [--note]` shipped in 22 pass / 0 fail, 212
+assertions across 9 files; `day` and `week` keep their own case. The worker flagged that it could not register the
+`routine` command in `index.ts` (outside its surfaces); the parent added the import and the registry entry, as S1
+requires. The bilingual READMEs (`README.md`, `README.es.md`) landed with the dark brand banner, and the repository
+was published **privately** to `AlonsoSG0/CodiceHub` at 0.3.0 with the three tags. Publishing exposed one operational
+trap: the machine's `~/.ssh/config` reaches GitHub through the `github.com-alonso` host alias, not plain
+`github.com`, so `origin` uses the alias URL and a plain `git@github.com:` remote is rejected with
+`Permission denied (publickey)`.
