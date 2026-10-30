@@ -35,7 +35,7 @@ function usage(): string {
     "Environment:",
     "  PORT       Server port",
     "  HOST       Loopback host",
-    "  CHUB_HOME  Data directory (default: ~/.local/share/chub)",
+    "  CHUB_HOME  Data directory (default: ~/.local/share/chub, or %LOCALAPPDATA%\\chub on Windows)",
   );
   return lines.join("\n");
 }

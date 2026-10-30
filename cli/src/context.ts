@@ -7,9 +7,23 @@ import { assetsHash } from "./asset-hash.js";
 import { createCliDb } from "./db.js";
 import { drizzleTarPath, webTarPath } from "./generated.js";
 
-/** The directory that holds the database, uploads and the extracted runtime assets. */
-export function dataHome(): string {
-  return resolve(process.env.CHUB_HOME ?? join(homedir(), ".local", "share", "chub"));
+/**
+ * The directory that holds the database, uploads and the extracted runtime assets.
+ *
+ * Windows gets %LOCALAPPDATA%\chub instead of a hidden Unix-style directory; CHUB_HOME overrides both.
+ */
+export function dataHome(
+  env: NodeJS.ProcessEnv = process.env,
+  platform: NodeJS.Platform = process.platform,
+): string {
+  if (env.CHUB_HOME) return resolve(env.CHUB_HOME);
+  if (platform === "win32" && env.LOCALAPPDATA) return join(env.LOCALAPPDATA, "chub");
+  return join(homeDirectory(env, platform), ".local", "share", "chub");
+}
+
+function homeDirectory(env: NodeJS.ProcessEnv, platform: NodeJS.Platform): string {
+  const configured = platform === "win32" ? (env.USERPROFILE ?? env.HOME) : env.HOME;
+  return configured ?? homedir();
 }
 
 function runtimePaths(home: string): { web: string; migrations: string } {
