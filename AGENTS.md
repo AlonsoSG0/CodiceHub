@@ -203,6 +203,10 @@ chunk of their own and nothing in the entry.
 
 ## Traps that already cost time here
 
+- Two builds can share one data home. `extractWeb` writes `runtime/<hash>/pid` and `pruneRuntime` removes an
+  extraction only when that pid is gone; a directory without the marker is kept on purpose. Do not "simplify" that
+  back to deleting every other hash: it deletes the assets of a server that is still running, and the API keeps
+  answering `200` while every page fails with `ENOENT` on `web/index.html`.
 - A block comment that contains the glob `**/*.mdx` closes itself at `*/` and makes `tsc` fail with a cascade of
   nonsense errors. Use line comments when documenting globs.
 - TanStack Table v9 is not v8: `useTable` plus an explicit feature set. `getVisibleCells()` needs

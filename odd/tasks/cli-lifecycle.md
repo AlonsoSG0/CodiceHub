@@ -165,3 +165,25 @@ correction: version bumped to 0.5.0, suite re-run before tagging (`cli` 55 pass,
 public and no other run waiting; the `gh run watch` that was supposed to follow it died on repeated API `502`s, not on
 a workflow failure. Nothing was re-tagged, moved or re-dispatched: a delayed release is cheaper than a moved tag.
 The Windows disclaimer is untouched, by instruction.
+
+**L12 (local incident, defect in a shipped rule):** the user's browser showed
+`ENOENT: no such file or directory, open '.../runtime/71cad242ec4647d9/web/index.html'`. Diagnosis, from the machine
+and not from theory: pid 121212 had been serving for 2 h 57 min from a binary whose inode was already replaced
+(`/proc/121212/exe` → `chub (deleted)`, md5 `920789fa…`, a third build next to the installed 0.4.4 `b3c64701…` and the
+local 0.5.0 `f186771d…`), while `runtime/` held only `14fa26b88c44a2e5`. So a different build started at 10:28 local,
+extracted itself and `pruneRuntime` deleted the directory the live instance was serving from. `/api` kept answering
+`200` because the API never reads web assets, which is why only the page failed with `500`. The database was untouched
+(`chub.db` mtime 08:56, no WAL). The blame is the rule, not the user: `pruneRuntime` deleted every hash but its own on
+the assumption that older instances were dead.
+
+Fixed in `cli/src/context.ts`: `extractWeb` now writes `runtime/<hash>/pid` with the serving pid, and pruning removes an
+extraction only when that pid is gone. A directory without the marker predates it and may still be in use, so it is
+kept — the failure direction is disk, never a broken server. `isAlive` moved to `cli/src/process.ts` so `context.ts`
+can read it without importing `server-state.ts` back (that would be a cycle). `cli/test/runtime.test.ts` was rewritten
+for the new rule, including one test whose whole point is that a live pid survives pruning. `cli` → 57 pass, exit 0.
+
+Recovery on the machine, with the user's authorization: `SIGTERM` to 121212 (left in 200 ms, WAL checkpointed away),
+`install -m755 cli/dist/chub ~/.local/bin/chub`, then `chub start`. `status` reports pid 259309 on 0.5.0, `/` and
+`/api/health` both `200`, and the legacy unmarked directory is still there, which is the new rule working. Note what
+this means for versions: the pushed tag `v0.5.0` does **not** contain this fix, the locally installed binary does.
+When that release publishes, cut 0.5.1 with it.

@@ -2,6 +2,10 @@ import { openSync, readlinkSync, renameSync, statSync } from "node:fs";
 import { chmod, mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { dataHome } from "./context.js";
+import { isAlive } from "./process.js";
+
+/** Re-exported so callers keep one import for what they read and signal about the running server. */
+export { isAlive };
 
 /**
  * What a serving `chub` records about itself so a second invocation can find it, describe it and stop it.
@@ -82,16 +86,6 @@ export async function clearState(home: string = dataHome(), runId?: string): Pro
     if (state !== undefined && state.runId !== runId) return;
   }
   await rm(statePath(home), { force: true });
-}
-
-/** True when the pid exists and is signalable by this process. `EPERM` counts as alive: someone else owns it. */
-export function isAlive(pid: number): boolean {
-  try {
-    process.kill(pid, 0);
-    return true;
-  } catch (error) {
-    return typeof error === "object" && error !== null && "code" in error && error.code === "EPERM";
-  }
 }
 
 /**
