@@ -1,4 +1,5 @@
-import { mkdir } from "node:fs/promises";
+import { mkdir, readdir, rm } from "node:fs/promises";
+import type { Dirent } from "node:fs";
 import { homedir } from "node:os";
 import { join, resolve } from "node:path";
 import type { ChubDatabase } from "../../server/src/db/client.js";
@@ -26,7 +27,25 @@ async function extract(archivePath: string, target: string, marker: string): Pro
 export async function extractWeb(home: string): Promise<string> {
   const { web } = runtimePaths(home);
   await extract(webTarPath, web, "index.html");
+  await pruneRuntime(home);
   return web;
+}
+
+/**
+ * Drop the runtime extracted for any other build, so updating chub does not keep a copy per version.
+ * Best effort by design: a leftover that cannot be removed is worth a retry on the next start, never an exit.
+ * The cost is that a second instance still running an older build loses its assets; restarting it fixes that.
+ */
+export async function pruneRuntime(home: string, keep: string = assetsHash): Promise<void> {
+  const root = join(home, "runtime");
+  let entries: Dirent[];
+  try {
+    entries = await readdir(root, { withFileTypes: true });
+  } catch {
+    return;
+  }
+  const stale = entries.filter((entry) => entry.isDirectory() && entry.name !== keep);
+  await Promise.all(stale.map((entry) => rm(join(root, entry.name), { recursive: true, force: true }).catch(() => undefined)));
 }
 
 /** The embedded migrations. Every path that opens the database needs these. */
