@@ -97,3 +97,13 @@ already node24). Checked before moving: every input we pass still exists in the 
 v7 enables automatic caching only for npm and only when no explicit `cache:` is given, download-artifact v8 only
 tightens digest mismatches into errors, and checkout's breaking change concerns `pull_request_target`, which this
 tag-only workflow never uses. The bump is exercised by the next tag, not by the 0.4.1 run.
+
+L8 (0.4.2, the release that finally carries the UI): after installing 0.4.1 the user reported seeing "the previous
+one". Diagnosis, not a defect: `git diff --stat v0.3.0 v0.4.1 -- web/` is empty and the served chunk names match the
+Oct 29 extraction byte for byte, because no commit between the two tags touched `web/` — the Home/Settings wave was
+still uncommitted, so `pnpm dev` showed it and no release could. Answer to the user: it was 0.4.1 all along (the
+process on :3000 ran the new binary, verified by the hash of `/proc/<pid>/exe`); the front end was identical.
+Then, on the user's instruction, the wave was committed (theme default atripp, Home orbital backdrop, Settings brand
+and version) after `pnpm --filter @chub/web test` (445 tests) and a root typecheck came back clean, and the installer
+stopped leaving garbage: the server now drops every `runtime/<hash>` but its own on start (`pruneRuntime`), which
+takes the six accumulated extractions from 19 MB back to 3.3 MB. `cd cli && bun run test` → 31 pass, 0 fail.
